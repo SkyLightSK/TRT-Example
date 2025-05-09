@@ -1,0 +1,54 @@
+<div class="user-list">
+  <div class="header">
+    <h1>User Management</h1>
+    <div class="actions">
+      <input type="text" placeholder="Search users..." class="search-input">
+      <button class="add-btn">Add User</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Roles</th>
+          <th>Impersonable Entities</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{user.username}}</td>
+          <td>{{user.email}}</td>
+          <td>
+            <div class="role-badges">
+              <span class="role-badge" *ngFor="let role of user.roles">
+                {{role}}
+              </span>
+            </div>
+          </td>
+          <td>
+            <div class="entity-list">
+              <span class="entity-badge" *ngFor="let entity of user.impersonableEntities">
+                {{entity.name}}
+              </span>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="user.status.toLowerCase()">
+              {{user.status}}
+            </span>
+          </td>
+          <td>
+            <button class="action-btn edit" (click)="onEdit(user)">Edit</button>
+            <button class="action-btn roles" (click)="onManageRoles(user)">Roles</button>
+            <button class="action-btn delete" (click)="onDelete(user)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div> 

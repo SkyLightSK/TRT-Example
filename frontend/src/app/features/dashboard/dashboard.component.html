@@ -1,0 +1,151 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <div class="actions">
+      <button class="btn btn-secondary">Export Report</button>
+      <button class="btn btn-primary">Refresh Data</button>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="card budget-summary">
+      <div class="card-header">
+        <h2>Budget Summary</h2>
+        <span class="badge">2024</span>
+      </div>
+      <div class="card-content">
+        <div class="metric">
+          <div class="metric-value">$1,245,000</div>
+          <div class="metric-label">Total Budget</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">$487,350</div>
+          <div class="metric-label">Spent to Date</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">39%</div>
+          <div class="metric-label">Utilization</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="progress-bar">
+          <div class="progress" style="width: 39%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card device-status">
+      <div class="card-header">
+        <h2>Device Status</h2>
+        <span class="badge">All Locations</span>
+      </div>
+      <div class="card-content">
+        <div class="status-grid">
+          <div class="status-item">
+            <div class="status-count">245</div>
+            <div class="status-label active">Active</div>
+          </div>
+          <div class="status-item">
+            <div class="status-count">32</div>
+            <div class="status-label warning">Needs Attention</div>
+          </div>
+          <div class="status-item">
+            <div class="status-count">18</div>
+            <div class="status-label danger">Critical</div>
+          </div>
+          <div class="status-item">
+            <div class="status-count">8</div>
+            <div class="status-label neutral">End of Life</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a routerLink="/hardware" class="link-btn">View All Devices</a>
+      </div>
+    </div>
+
+    <div class="card notifications">
+      <div class="card-header">
+        <h2>Recent Notifications</h2>
+      </div>
+      <div class="card-content">
+        <div class="notification-list">
+          <div class="notification warning">
+            <div class="notification-icon">⚠️</div>
+            <div class="notification-content">
+              <div class="notification-title">Device Maintenance Required</div>
+              <div class="notification-message">Terminal #T-1234 requires maintenance.</div>
+              <div class="notification-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="notification info">
+            <div class="notification-icon">ℹ️</div>
+            <div class="notification-content">
+              <div class="notification-title">Budget Report Available</div>
+              <div class="notification-message">Q2 budget report is now available.</div>
+              <div class="notification-time">Yesterday</div>
+            </div>
+          </div>
+          <div class="notification danger">
+            <div class="notification-icon">🚨</div>
+            <div class="notification-content">
+              <div class="notification-title">Critical Update Required</div>
+              <div class="notification-message">Security update needed for 18 devices.</div>
+              <div class="notification-time">3 days ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="#" class="link-btn">View All Notifications</a>
+      </div>
+    </div>
+
+    <div class="card upcoming-eol">
+      <div class="card-header">
+        <h2>Upcoming End of Life</h2>
+      </div>
+      <div class="card-content">
+        <table class="eol-table">
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>Location</th>
+              <th>EOL Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Verifone MX915</td>
+              <td>POS-03</td>
+              <td>Jun 30, 2024</td>
+              <td><span class="badge warning">30 days</span></td>
+            </tr>
+            <tr>
+              <td>Verifone MX915</td>
+              <td>POS-04</td>
+              <td>Jun 30, 2024</td>
+              <td><span class="badge warning">30 days</span></td>
+            </tr>
+            <tr>
+              <td>DMB Media Player</td>
+              <td>DMB-01</td>
+              <td>Jul 15, 2024</td>
+              <td><span class="badge info">45 days</span></td>
+            </tr>
+            <tr>
+              <td>Kiosk Enclosure</td>
+              <td>K-02</td>
+              <td>Aug 22, 2024</td>
+              <td><span class="badge info">83 days</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <a routerLink="/hardware" class="link-btn">View All Devices</a>
+      </div>
+    </div>
+  </div>
+</div> 

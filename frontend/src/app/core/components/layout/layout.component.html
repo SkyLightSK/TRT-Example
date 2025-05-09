@@ -1,0 +1,51 @@
+<div class="layout">
+  <nav class="navbar">
+    <div class="navbar-brand">TRT Portal</div>
+    <div class="navbar-menu">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/hardware" routerLinkActive="active">Hardware</a>
+      <a routerLink="/budget" routerLinkActive="active">Budget</a>
+      <a routerLink="/admin" routerLinkActive="active">Admin</a>
+    </div>
+    <div class="navbar-right">
+      <div class="entity-badge">
+        <span class="icon">🏬</span>
+        <span>Aaron, James D Jr</span>
+      </div>
+      <div class="user-profile">
+        <span class="user-name">Admin User</span>
+        <div class="avatar">A</div>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="main-content">
+    <aside class="sidebar">
+      <div class="entity-selector">
+        <select>
+          <option>Select Entity...</option>
+          <option>Store A</option>
+          <option>Store B</option>
+          <option>Store C</option>
+        </select>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <h3>Hardware</h3>
+          <a routerLink="/hardware" routerLinkActive="active">All Devices</a>
+          <a routerLink="/hardware/terminals" routerLinkActive="active">Terminals</a>
+          <a routerLink="/hardware/kiosks" routerLinkActive="active">Kiosks</a>
+        </div>
+        <div class="nav-section">
+          <h3>Budget</h3>
+          <a routerLink="/budget" routerLinkActive="active">Overview</a>
+          <a routerLink="/budget/forecasts" routerLinkActive="active">Forecasts</a>
+        </div>
+      </nav>
+    </aside>
+    
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div> 

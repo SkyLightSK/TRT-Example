@@ -1,0 +1,170 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 64px;
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 2rem;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 1.5rem;
+  
+  a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    position: relative;
+    font-weight: 500;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: white;
+      transition: width 0.3s ease;
+    }
+    
+    &:hover::after, &.active::after {
+      width: 100%;
+    }
+  }
+}
+
+.navbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  
+  .entity-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    
+    .icon {
+      font-size: 1.25rem;
+    }
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    
+    .user-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+  }
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--light);
+  padding: 1.5rem 1rem;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  
+  .entity-selector {
+    margin-bottom: 1.5rem;
+    
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background-color: white;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      h3 {
+        font-size: 0.875rem;
+        color: var(--dark);
+        text-transform: uppercase;
+        margin: 0 0 0.5rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      
+      a {
+        color: var(--dark);
+        text-decoration: none;
+        font-size: 0.9375rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+        
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        &.active {
+          background-color: var(--secondary);
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background-color: #f9fafb;
+} 

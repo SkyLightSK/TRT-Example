@@ -1,0 +1,52 @@
+<div class="hardware-list">
+  <div class="header">
+    <h1>Device Inventory</h1>
+    <div class="actions">
+      <select class="filter-dropdown">
+        <option value="">All Types</option>
+        <option value="Kiosk">Kiosk</option>
+        <option value="Register">Register</option>
+        <option value="DMB">DMB</option>
+        <option value="Enclosure">Enclosure</option>
+      </select>
+      <input type="text" placeholder="Search devices..." class="search-input">
+      <button class="export-btn">Export</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>NSN</th>
+          <th>Type</th>
+          <th>Manufacturer</th>
+          <th>Model</th>
+          <th>Location</th>
+          <th>EOL Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let device of devices">
+          <td>{{device.nsn}}</td>
+          <td>{{device.type}}</td>
+          <td>{{device.manufacturer}}</td>
+          <td>{{device.model}}</td>
+          <td>{{device.location}}</td>
+          <td>{{device.endOfLife | date}}</td>
+          <td>
+            <span class="status-badge" [ngClass]="device.status.toLowerCase()">
+              {{device.status}}
+            </span>
+          </td>
+          <td>
+            <button class="action-btn edit">Edit</button>
+            <button class="action-btn delete">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div> 

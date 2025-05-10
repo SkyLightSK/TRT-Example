@@ -17,45 +17,45 @@
       <!-- NSN Column -->
       <ng-container matColumnDef="nsn">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>NSN</th>
-        <td mat-cell *matCellDef="let device">{{device.nsn}}</td>
+        <td mat-cell *matCellDef="let device">{{device.nsn || 'N/A'}}</td>
       </ng-container>
 
       <!-- Type Column -->
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
-        <td mat-cell *matCellDef="let device">{{device.type}}</td>
+        <td mat-cell *matCellDef="let device">{{device.type || 'N/A'}}</td>
       </ng-container>
 
       <!-- Manufacturer Column -->
       <ng-container matColumnDef="manufacturer">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturer</th>
-        <td mat-cell *matCellDef="let device">{{device.manufacturer}}</td>
+        <td mat-cell *matCellDef="let device">{{device.manufacturer || 'N/A'}}</td>
       </ng-container>
 
       <!-- Model Column -->
       <ng-container matColumnDef="model">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Model</th>
-        <td mat-cell *matCellDef="let device">{{device.model}}</td>
+        <td mat-cell *matCellDef="let device">{{device.model || 'N/A'}}</td>
       </ng-container>
 
       <!-- Location Column -->
       <ng-container matColumnDef="location">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Location</th>
-        <td mat-cell *matCellDef="let device">{{device.location}}</td>
+        <td mat-cell *matCellDef="let device">{{device.location || 'N/A'}}</td>
       </ng-container>
 
       <!-- End of Life Column -->
       <ng-container matColumnDef="endOfLife">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>End of Life</th>
-        <td mat-cell *matCellDef="let device">{{device.endOfLife | date}}</td>
+        <td mat-cell *matCellDef="let device">{{device.endOfLife ? (device.endOfLife | date) : 'N/A'}}</td>
       </ng-container>
 
       <!-- Status Column -->
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
         <td mat-cell *matCellDef="let device">
-          <span class="status-badge" [ngClass]="device.status.toLowerCase()">
-            {{device.status}}
+          <span class="status-badge" [ngClass]="device.status ? device.status.toLowerCase() : 'unknown'">
+            {{device.status || 'Unknown'}}
           </span>
         </td>
       </ng-container>
@@ -64,8 +64,8 @@
       <ng-container matColumnDef="eligibleUpgrade">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Eligible for Upgrade</th>
         <td mat-cell *matCellDef="let device">
-          <mat-icon [ngClass]="{'eligible': device.eligibleUpgrade}">
-            {{device.eligibleUpgrade ? 'check_circle' : 'cancel'}}
+          <mat-icon [ngClass]="{'eligible': device.eligibleUpgrade === 'Yes'}">
+            {{device.eligibleUpgrade === 'Yes' ? 'check_circle' : 'cancel'}}
           </mat-icon>
         </td>
       </ng-container>

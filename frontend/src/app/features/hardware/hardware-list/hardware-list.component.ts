@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule, MatTable } from '@angular/material/table';
+import { MatTableModule, MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +14,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Device, CreateDeviceDto, UpdateDeviceDto } from '../models/device.model';
 import { HardwareService } from '../services/hardware.service';
 import { DeviceFormComponent } from '../device-form/device-form.component';
@@ -38,12 +39,12 @@ import { DeviceFormComponent } from '../device-form/device-form.component';
     MatProgressSpinnerModule,
     MatPaginatorModule,
     MatSortModule,
-    DeviceFormComponent
+    MatTooltipModule
   ],
   templateUrl: './hardware-list.component.html',
   styleUrls: ['./hardware-list.component.scss']
 })
-export class HardwareListComponent implements OnInit {
+export class HardwareListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
     'nsn',
     'type',
@@ -55,7 +56,7 @@ export class HardwareListComponent implements OnInit {
     'eligibleUpgrade',
     'actions'
   ];
-  dataSource: Device[] = [];
+  dataSource = new MatTableDataSource<Device>([]);
   isLoading = false;
   filterValue = '';
 
@@ -73,12 +74,23 @@ export class HardwareListComponent implements OnInit {
     this.loadDevices();
   }
 
+  ngAfterViewInit(): void {
+    if (this.dataSource) {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    }
+  }
+
   loadDevices(): void {
     this.isLoading = true;
     this.hardwareService.getDevices().subscribe({
       next: (devices) => {
-        this.dataSource = devices;
+        console.log('Loaded devices:', devices);
+        this.dataSource.data = devices;
         this.isLoading = false;
+        if (this.table) {
+          this.table.renderRows();
+        }
       },
       error: (error) => {
         console.error('Error loading devices:', error);
@@ -108,7 +120,8 @@ export class HardwareListComponent implements OnInit {
   createDevice(device: CreateDeviceDto): void {
     this.hardwareService.createDevice(device).subscribe({
       next: (newDevice) => {
-        this.dataSource = [...this.dataSource, newDevice];
+        const currentData = this.dataSource.data;
+        this.dataSource.data = [...currentData, newDevice];
         this.snackBar.open('Device created successfully', 'Close', { duration: 3000 });
       },
       error: (error) => {
@@ -121,10 +134,11 @@ export class HardwareListComponent implements OnInit {
   updateDevice(id: number, device: UpdateDeviceDto): void {
     this.hardwareService.updateDevice(id, device).subscribe({
       next: (updatedDevice) => {
-        const index = this.dataSource.findIndex(d => d.id === id);
+        const currentData = this.dataSource.data;
+        const index = currentData.findIndex(d => d.id === id);
         if (index !== -1) {
-          this.dataSource[index] = updatedDevice;
-          this.dataSource = [...this.dataSource];
+          currentData[index] = updatedDevice;
+          this.dataSource.data = [...currentData];
         }
         this.snackBar.open('Device updated successfully', 'Close', { duration: 3000 });
       },
@@ -139,7 +153,7 @@ export class HardwareListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this device?')) {
       this.hardwareService.deleteDevice(id).subscribe({
         next: () => {
-          this.dataSource = this.dataSource.filter(d => d.id !== id);
+          this.dataSource.data = this.dataSource.data.filter(d => d.id !== id);
           this.snackBar.open('Device deleted successfully', 'Close', { duration: 3000 });
         },
         error: (error) => {
@@ -153,6 +167,10 @@ export class HardwareListComponent implements OnInit {
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filterValue = filterValue.trim().toLowerCase();
-    // Implement filtering logic here
+    this.dataSource.filter = this.filterValue;
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 } 

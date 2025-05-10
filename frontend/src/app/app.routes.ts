@@ -1,10 +1,26 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './core/components/layout/layout.component';
+import { authGuard, authGuardChild } from './core/guards/auth.guard';
+import { LoginComponent } from './features/auth/login/login.component';
 
 export const routes: Routes = [
+  // Auth routes - these come first and are not protected
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'unauthorized',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  
+  // Protected routes - these require authentication
   {
     path: '',
     component: LayoutComponent,
+    canActivate: [authGuard],
+    canActivateChild: [authGuardChild],
     children: [
       {
         path: '',
@@ -25,8 +41,15 @@ export const routes: Routes = [
       },
       {
         path: 'admin',
-        loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule)
+        loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule),
+        data: { requiredRole: 'ADMIN' }
       }
     ]
+  },
+  
+  // Catch-all route - redirect to login
+  {
+    path: '**',
+    redirectTo: 'login'
   }
 ];

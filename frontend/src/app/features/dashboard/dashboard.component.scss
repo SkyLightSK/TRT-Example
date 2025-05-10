@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .dashboard {
   display: flex;
   flex-direction: column;
@@ -35,7 +37,7 @@
     color: white;
     
     &:hover {
-      background-color: darken(#3498db, 10%);
+      background-color: color.adjust(#3498db, $lightness: -10%);
     }
   }
   

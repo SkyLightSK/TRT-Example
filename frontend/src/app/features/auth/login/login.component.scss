@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Variables
 $primary-color: #1976d2;
 $danger-color: #f44336;
@@ -109,11 +111,11 @@ $shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       transition: background-color 0.2s;
       
       &:hover:not(:disabled) {
-        background-color: darken($primary-color, 10%);
+        background-color: color.adjust($primary-color, $lightness: -10%);
       }
       
       &:disabled {
-        background-color: lighten($primary-color, 20%);
+        background-color: color.adjust($primary-color, $lightness: 20%);
         cursor: not-allowed;
       }
       

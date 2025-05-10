@@ -1,0 +1,108 @@
+<div class="container">
+  <!-- Summary Cards -->
+  <div class="summary-cards" *ngIf="!isLoading">
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Total Planned</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="amount">{{summary?.totalPlanned | currency}}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Total Actual</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="amount">{{summary?.totalActual | currency}}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Total Variance</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="amount" [ngClass]="{'positive': (summary?.totalVariance ?? 0) > 0, 'negative': (summary?.totalVariance ?? 0) < 0}">
+          {{summary?.totalVariance | currency}}
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Year over Year Growth</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="amount" [ngClass]="{'positive': (summary?.yearOverYearGrowth ?? 0) > 0, 'negative': (summary?.yearOverYearGrowth ?? 0) < 0}">
+          {{summary?.yearOverYearGrowth | number:'1.1-1'}}%
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Forecasts Table -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Budget Forecasts</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="forecast-content">
+        <div class="loading-spinner" *ngIf="isLoading">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+        
+        <div class="forecast-table" *ngIf="!isLoading">
+          <table mat-table [dataSource]="forecasts" class="mat-elevation-z2">
+            <!-- Year Column -->
+            <ng-container matColumnDef="year">
+              <th mat-header-cell *matHeaderCellDef>Year</th>
+              <td mat-cell *matCellDef="let forecast">{{forecast.year}}</td>
+            </ng-container>
+
+            <!-- Category Column -->
+            <ng-container matColumnDef="category">
+              <th mat-header-cell *matHeaderCellDef>Category</th>
+              <td mat-cell *matCellDef="let forecast">{{forecast.category}}</td>
+            </ng-container>
+
+            <!-- Planned Amount Column -->
+            <ng-container matColumnDef="plannedAmount">
+              <th mat-header-cell *matHeaderCellDef>Planned Amount</th>
+              <td mat-cell *matCellDef="let forecast">{{forecast.plannedAmount | currency}}</td>
+            </ng-container>
+
+            <!-- Actual Amount Column -->
+            <ng-container matColumnDef="actualAmount">
+              <th mat-header-cell *matHeaderCellDef>Actual Amount</th>
+              <td mat-cell *matCellDef="let forecast">{{forecast.actualAmount | currency}}</td>
+            </ng-container>
+
+            <!-- Variance Column -->
+            <ng-container matColumnDef="variance">
+              <th mat-header-cell *matHeaderCellDef>Variance</th>
+              <td mat-cell *matCellDef="let forecast" [ngClass]="{'positive': forecast.variance > 0, 'negative': forecast.variance < 0}">
+                {{forecast.variance | currency}}
+              </td>
+            </ng-container>
+
+            <!-- Trend Column -->
+            <ng-container matColumnDef="trend">
+              <th mat-header-cell *matHeaderCellDef>Trend</th>
+              <td mat-cell *matCellDef="let forecast">
+                <mat-icon [ngClass]="forecast.trend">
+                  {{forecast.trend === 'up' ? 'trending_up' : 
+                    forecast.trend === 'down' ? 'trending_down' : 'trending_flat'}}
+                </mat-icon>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div> 

@@ -1,1 +1,165 @@
- 
+<div class="budget-container">
+  <div class="header">
+    <h1>Budget Management</h1>
+    <div class="controls">
+      <div class="year-selector">
+        <label for="year">Fiscal Year:</label>
+        <select id="year" [ngModel]="selectedYear" (ngModelChange)="onYearChange($event)">
+          <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+        </select>
+      </div>
+      <button class="add-btn" (click)="onAdd()">
+        <i class="fa fa-plus"></i> Add Budget
+      </button>
+    </div>
+  </div>
+
+  <div class="budget-summary" *ngIf="filteredBudgets.length">
+    <div class="card">
+      <h2>Budget Overview</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="label">Total Budget</span>
+          <span class="value">{{ getTotalAmount() | currency }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Number of Budgets</span>
+          <span class="value">{{ filteredBudgets.length }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button [class.active]="activeTab === 'budgets'" (click)="activeTab = 'budgets'">Budgets</button>
+    <button [class.active]="activeTab === 'items'" (click)="activeTab = 'items'">Budget Items</button>
+  </div>
+
+  <div *ngIf="activeTab === 'budgets'">
+    <div class="loading" *ngIf="loading">Loading budgets...</div>
+    
+    <div class="empty-state" *ngIf="!loading && filteredBudgets.length === 0">
+      <p>No budgets found for the selected year.</p>
+      <button (click)="onAdd()">Create New Budget</button>
+    </div>
+    
+    <div class="budget-grid" *ngIf="!loading && filteredBudgets.length > 0">
+      <div class="grid-header">
+        <div class="col">Name</div>
+        <div class="col">Fiscal Year</div>
+        <div class="col">Total Amount</div>
+        <div class="col">Start Date</div>
+        <div class="col">End Date</div>
+        <div class="col actions">Actions</div>
+      </div>
+      
+      <div class="grid-row" *ngFor="let budget of filteredBudgets">
+        <div class="col">{{ budget.name }}</div>
+        <div class="col">{{ budget.fiscalYear }}</div>
+        <div class="col">{{ budget.totalAmount | currency }}</div>
+        <div class="col">{{ budget.startDate | date }}</div>
+        <div class="col">{{ budget.endDate | date }}</div>
+        <div class="col actions">
+          <button class="edit-btn" (click)="onEditBudget(budget)">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button class="delete-btn" (click)="onDeleteBudget(budget)">
+            <i class="fa fa-trash"></i>
+          </button>
+          <button class="view-btn" (click)="viewBudgetItems(budget)">
+            <i class="fa fa-list"></i> Items
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="activeTab === 'items'">
+    <div class="loading" *ngIf="loadingItems">Loading budget items...</div>
+    
+    <div class="empty-state" *ngIf="!loadingItems && budgetItems.length === 0">
+      <p>No budget items found.</p>
+    </div>
+    
+    <div class="budget-items-grid" *ngIf="!loadingItems && budgetItems.length > 0">
+      <div class="grid-header">
+        <div class="col">Description</div>
+        <div class="col">Amount</div>
+        <div class="col">Budget</div>
+        <div class="col">Notes</div>
+        <div class="col actions">Actions</div>
+      </div>
+      
+      <div class="grid-row" *ngFor="let item of budgetItems">
+        <div class="col">{{ item.description }}</div>
+        <div class="col">{{ item.amount | currency }}</div>
+        <div class="col">{{ getBudgetName(item) }}</div>
+        <div class="col">{{ item.notes }}</div>
+        <div class="col actions">
+          <button class="edit-btn" (click)="onEditBudgetItem(item)">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button class="delete-btn" (click)="onDeleteBudgetItem(item)">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>{{ editingBudget ? 'Edit Budget' : 'Add New Budget' }}</h2>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="budgetForm" (ngSubmit)="saveBudget()">
+        <div class="form-group">
+          <label for="name">Budget Name</label>
+          <input type="text" id="name" formControlName="name">
+          <div class="error" *ngIf="budgetForm.get('name')?.invalid && budgetForm.get('name')?.touched">
+            Budget name is required
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="fiscalYear">Fiscal Year</label>
+          <input type="number" id="fiscalYear" formControlName="fiscalYear">
+          <div class="error" *ngIf="budgetForm.get('fiscalYear')?.invalid && budgetForm.get('fiscalYear')?.touched">
+            Fiscal year is required
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="totalAmount">Total Amount</label>
+          <input type="number" id="totalAmount" formControlName="totalAmount">
+          <div class="error" *ngIf="budgetForm.get('totalAmount')?.invalid && budgetForm.get('totalAmount')?.touched">
+            Total amount is required and must be greater than 0
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input type="date" id="startDate" formControlName="startDate">
+        </div>
+        
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input type="date" id="endDate" formControlName="endDate">
+        </div>
+        
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea id="notes" formControlName="notes"></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" (click)="closeModal()">Cancel</button>
+          <button type="submit" [disabled]="budgetForm.invalid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

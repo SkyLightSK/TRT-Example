@@ -23,21 +23,45 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/auth/logout`, {});
   }
 
+  getProfile(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/auth/me`);
+  }
+
   // Entity endpoints
   getEntities(): Observable<any> {
     return this.http.get(`${this.baseUrl}/entities`);
   }
 
-  impersonateEntity(entityId: string): Observable<any> {
+  getEntity(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/entities/${id}`);
+  }
+
+  createEntity(entity: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/entities`, entity);
+  }
+
+  updateEntity(id: number, entity: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/entities/${id}`, entity);
+  }
+
+  deleteEntity(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/entities/${id}`);
+  }
+
+  impersonateEntity(entityId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/impersonate`, { entityId });
   }
 
   // Device endpoints
-  getDevices(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/devices`);
+  getDevices(entityId?: number): Observable<any> {
+    let url = `${this.baseUrl}/devices`;
+    if (entityId) {
+      url += `?entityId=${entityId}`;
+    }
+    return this.http.get(url);
   }
 
-  getDevice(id: string): Observable<any> {
+  getDevice(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/devices/${id}`);
   }
 
@@ -45,20 +69,24 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/devices`, device);
   }
 
-  updateDevice(id: string, device: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/devices/${id}`, device);
+  updateDevice(id: number, device: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/devices/${id}`, device);
   }
 
-  deleteDevice(id: string): Observable<any> {
+  deleteDevice(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/devices/${id}`);
   }
 
   // Budget endpoints
-  getBudgets(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/budgets`);
+  getBudgets(fiscalYear?: number): Observable<any> {
+    let url = `${this.baseUrl}/budgets`;
+    if (fiscalYear) {
+      url += `?fiscalYear=${fiscalYear}`;
+    }
+    return this.http.get(url);
   }
 
-  getBudget(id: string): Observable<any> {
+  getBudget(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/budgets/${id}`);
   }
 
@@ -66,11 +94,20 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/budgets`, budget);
   }
 
-  updateBudget(id: string, budget: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/budgets/${id}`, budget);
+  updateBudget(id: number, budget: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/budgets/${id}`, budget);
   }
 
-  deleteBudget(id: string): Observable<any> {
+  deleteBudget(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/budgets/${id}`);
+  }
+  
+  // Budget Items endpoints
+  getBudgetItems(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/budgets/items`);
+  }
+  
+  getBudgetItem(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/budgets/items/${id}`);
   }
 } 

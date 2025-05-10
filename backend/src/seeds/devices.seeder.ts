@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository, Not, IsNull } from 'typeorm';
 import { Device, DeviceStatus, DeviceType } from '../devices/entities/device.entity';
 import { Entity } from '../entities/entities/entity.entity';
 import { BaseSeeder } from './base.seeder';
@@ -17,76 +17,95 @@ export class DevicesSeeder extends BaseSeeder<Device> {
   }
 
   async seed(): Promise<void> {
-    this.logger.log('Seeding devices...');
+    this.logger.log('STARTING DEVICE SEEDER');
     
-    // Get all the store entities (those with parentId not null)
+    // Find all store entities (they have parentId not null)
     const storeEntities = await this.entitiesRepository.find({
-      where: { parentId: Not(null) }
+      where: { parentId: Not(IsNull()) }
     });
+    
+    this.logger.log(`Found ${storeEntities.length} store entities for seeding`);
     
     if (storeEntities.length === 0) {
       this.logger.warn('No store entities found, skipping device seeding');
       return;
     }
     
-    // Create 2-3 devices for each store entity
+    let createdCount = 0;
+    
+    // Create devices for each store
     for (const storeEntity of storeEntities) {
-      // Kiosk
-      await this.createDeviceIfNotExists({
-        name: `Kiosk 1 - ${storeEntity.code}`,
-        serialNumber: `KSK-${storeEntity.code}-001`,
-        model: 'Verifone MX915',
-        deviceType: DeviceType.Kiosk,
-        deviceStatus: DeviceStatus.Active,
-        purchaseDate: new Date('2023-01-15'),
-        warrantyExpiration: new Date('2026-01-15'),
-        entity: Promise.resolve(storeEntity)
-      });
+      this.logger.log(`Creating devices for store: ${storeEntity.name} (ID: ${storeEntity.id})`);
       
-      // Register
-      await this.createDeviceIfNotExists({
-        name: `Register 1 - ${storeEntity.code}`,
-        serialNumber: `REG-${storeEntity.code}-001`,
-        model: 'NCR RealPOS 7801',
-        deviceType: DeviceType.Register,
-        deviceStatus: DeviceStatus.Active,
-        purchaseDate: new Date('2023-02-20'),
-        warrantyExpiration: new Date('2026-02-20'),
-        entity: Promise.resolve(storeEntity)
-      });
-      
-      // DMB (Digital Menu Board)
-      await this.createDeviceIfNotExists({
-        name: `DMB 1 - ${storeEntity.code}`,
-        serialNumber: `DMB-${storeEntity.code}-001`,
-        model: 'Samsung QM43R-F',
-        deviceType: DeviceType.DMB,
-        deviceStatus: DeviceStatus.Active,
-        purchaseDate: new Date('2023-03-10'),
-        warrantyExpiration: new Date('2026-03-10'),
-        entity: Promise.resolve(storeEntity)
-      });
+      try {
+        // Create a Kiosk device
+        const kiosk = this.devicesRepository.create({
+          name: `Kiosk 1 - ${storeEntity.code}`,
+          serialNumber: `KSK-${storeEntity.code}-001`,
+          model: 'Verifone MX915',
+          deviceType: DeviceType.Kiosk,
+          deviceStatus: DeviceStatus.Active,
+          purchaseDate: new Date('2023-01-15'),
+          warrantyExpiration: new Date('2026-01-15')
+        });
+        
+        // Set the relationship
+        kiosk.entity = Promise.resolve(storeEntity);
+        
+        // Save to database
+        await this.devicesRepository.save(kiosk);
+        createdCount++;
+        this.logger.log(`Created Kiosk device for ${storeEntity.name}`);
+        
+        // Create a Register device
+        const register = this.devicesRepository.create({
+          name: `Register 1 - ${storeEntity.code}`,
+          serialNumber: `REG-${storeEntity.code}-001`,
+          model: 'NCR RealPOS 7801',
+          deviceType: DeviceType.Register,
+          deviceStatus: DeviceStatus.Active,
+          purchaseDate: new Date('2023-02-20'),
+          warrantyExpiration: new Date('2026-02-20')
+        });
+        
+        // Set the relationship
+        register.entity = Promise.resolve(storeEntity);
+        
+        // Save to database
+        await this.devicesRepository.save(register);
+        createdCount++;
+        this.logger.log(`Created Register device for ${storeEntity.name}`);
+        
+        // Create a DMB device
+        const dmb = this.devicesRepository.create({
+          name: `DMB 1 - ${storeEntity.code}`,
+          serialNumber: `DMB-${storeEntity.code}-001`,
+          model: 'Samsung QM43R-F',
+          deviceType: DeviceType.DMB,
+          deviceStatus: DeviceStatus.Active,
+          purchaseDate: new Date('2023-03-10'),
+          warrantyExpiration: new Date('2026-03-10')
+        });
+        
+        // Set the relationship
+        dmb.entity = Promise.resolve(storeEntity);
+        
+        // Save to database
+        await this.devicesRepository.save(dmb);
+        createdCount++;
+        this.logger.log(`Created DMB device for ${storeEntity.name}`);
+        
+      } catch (error) {
+        this.logger.error(`Error creating devices for store ${storeEntity.name}: ${error.message}`);
+      }
     }
     
-    this.logger.log('Devices seeding completed');
-  }
-  
-  private async createDeviceIfNotExists(deviceData: Partial<Device>): Promise<void> {
-    const existingDevice = await this.devicesRepository.findOne({ 
-      where: { serialNumber: deviceData.serialNumber } 
-    });
-    
-    if (!existingDevice) {
-      await this.devicesRepository.save(deviceData);
-      this.logger.log(`Created device: ${deviceData.name}`);
-    } else {
-      this.logger.log(`Device ${deviceData.name} already exists, skipping`);
-    }
+    this.logger.log(`DEVICE SEEDING COMPLETED: Created ${createdCount} devices for ${storeEntities.length} stores`);
   }
 
   async delete(): Promise<void> {
-    this.logger.log('Deleting devices...');
+    this.logger.log('Deleting all devices...');
     await this.devicesRepository.clear();
-    this.logger.log('Devices deleted');
+    this.logger.log('All devices deleted');
   }
 } 

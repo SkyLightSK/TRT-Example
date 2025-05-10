@@ -60,14 +60,18 @@ export class BudgetsController {
     return this.budgetsService.remove(+id);
   }
 
-  @Get()
+  @UseGuards(JwtAuthGuard)
+  @Get('items')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all budget items' })
   @ApiResponse({ status: 200, description: 'Return all budget items', type: [BudgetItem] })
   findAllItems(): Promise<BudgetItem[]> {
     return this.budgetsService.findAllItems();
   }
 
-  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @Get('items/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get budget item by id' })
   @ApiResponse({ status: 200, description: 'Return budget item by id', type: BudgetItem })
   @ApiResponse({ status: 404, description: 'Budget item not found' })

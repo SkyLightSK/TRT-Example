@@ -1,28 +1,30 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { DevicesModule } from './devices/devices.module';
 import { BudgetsModule } from './budgets/budgets.module';
+import { DevicesModule } from './devices/devices.module';
 import { EntitiesModule } from './entities/entities.module';
+import { SeedModule } from './seeds/seed.module';
+import { getDatabaseConfig } from './config/database.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'trt_portal',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Set to false in production
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: getDatabaseConfig,
     }),
     AuthModule,
     UsersModule,
     DevicesModule,
     BudgetsModule,
     EntitiesModule,
+    SeedModule,
   ],
 })
 export class AppModule {} 

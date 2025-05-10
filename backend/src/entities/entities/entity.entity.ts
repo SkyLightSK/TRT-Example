@@ -1,24 +1,43 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Entity as EntityDecorator, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Device } from '../../devices/entities/device.entity';
 import { BudgetItem } from '../../budgets/entities/budget-item.entity';
+import { Budget } from '../../budgets/entities/budget.entity';
 
-@Entity()
+@EntityDecorator()
 export class Entity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   name: string;
 
+  @Column()
+  description: string;
+
+  @Column()
+  code: string;
+
   @Column({ nullable: true })
-  parentEntityId: string;
+  parentId: number;
 
-  @ManyToOne(() => Entity, { nullable: true })
-  parentEntity: Entity;
+  @ManyToOne(() => Entity, entity => entity.children, { lazy: true })
+  parent: Promise<Entity>;
 
-  @OneToMany(() => Device, device => device.entity)
-  devices: Device[];
+  @OneToMany(() => Entity, entity => entity.parent, { lazy: true })
+  children: Promise<Entity[]>;
 
-  @OneToMany(() => BudgetItem, budgetItem => budgetItem.entity)
-  budgetItems: BudgetItem[];
+  @OneToMany(() => Device, device => device.entity, { lazy: true })
+  devices: Promise<Device[]>;
+
+  @OneToMany(() => BudgetItem, budgetItem => budgetItem.entity, { lazy: true })
+  budgetItems: Promise<BudgetItem[]>;
+
+  @OneToMany(() => Budget, budget => budget.entity, { lazy: true })
+  budgets: Promise<Budget[]>;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 } 

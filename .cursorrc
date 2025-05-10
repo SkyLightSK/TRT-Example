@@ -1,0 +1,23 @@
+{
+  "ai": {
+    "restrictions": {
+      "fileModifications": "askBeforeChanging",
+      "maxFilesTouched": 1,
+      "protectedPaths": [
+        "src/core/**", 
+        "config/**",
+        "**/*.entity.ts"
+      ],
+      "requireExplicitApproval": true
+    },
+    "guidelines": [
+      "Only modify files explicitly mentioned in the request",
+      "Never remove relations or change existing functionality, comments",
+      "Always explain changes before implementing them",
+      "Focus only on the specific task requested",
+      "When fixing issues, make minimal changes required to solve the problem",
+      "Always preserve existing code structure and patterns"
+    ],
+    "customInstructions": "IMPORTANT: You must follow these rules for every interaction:\n1. Only modify the specific file mentioned in my request\n2. Do not change existing functionality or remove relations\n4. Focus exclusively on the requested task\n5. If unsure about a change, ask first instead of implementing"
+  }
+} 

@@ -1,0 +1,56 @@
+<div class="admin-container">
+  <div class="feature-banner">
+    <mat-icon>construction</mat-icon>
+    <span>This is a showcase of potential system settings functionality that will be implemented in the future.</span>
+  </div>
+
+  <div class="admin-header">
+    <h1>System Settings</h1>
+  </div>
+
+  <mat-card class="settings-card">
+    <mat-tab-group>
+      <mat-tab *ngFor="let category of settingsCategories" [label]="category.name">
+        <div class="settings-list">
+          <div class="setting-item" *ngFor="let setting of category.settings">
+            <div class="setting-info">
+              <h3>{{setting.name}}</h3>
+              <p class="setting-description">{{setting.description}}</p>
+            </div>
+            <div class="setting-control">
+              <!-- Text input -->
+              <mat-form-field *ngIf="setting.type === 'text'">
+                <input matInput [value]="setting.value" [disabled]="true">
+              </mat-form-field>
+              
+              <!-- Number input -->
+              <mat-form-field *ngIf="setting.type === 'number'">
+                <input matInput type="number" [value]="setting.value" [disabled]="true">
+              </mat-form-field>
+              
+              <!-- Select dropdown -->
+              <mat-form-field *ngIf="setting.type === 'select'">
+                <mat-select [value]="setting.value" [disabled]="true">
+                  <mat-option *ngFor="let option of (setting.type === 'select' ? setting.options : [])" [value]="option">
+                    {{option}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              
+              <!-- Toggle switch -->
+              <mat-slide-toggle *ngIf="setting.type === 'toggle'" 
+                [checked]="setting.value" 
+                [disabled]="true">
+              </mat-slide-toggle>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+    
+    <mat-card-actions align="end">
+      <button mat-button color="primary" disabled>Reset to Defaults</button>
+      <button mat-raised-button color="primary" disabled>Save Changes</button>
+    </mat-card-actions>
+  </mat-card>
+</div> 

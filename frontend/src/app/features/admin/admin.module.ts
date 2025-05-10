@@ -1,26 +1,28 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { UserListComponent } from './user-list/user-list.component';
-import { EntityManagementComponent } from './entity-management/entity-management.component';
-import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { CommonModule } from '@angular/common';
 
-const routes: Routes = [
-  {
-    path: '',
-    component: AdminDashboardComponent
-  },
-  {
-    path: 'users',
-    component: UserListComponent
-  },
-  {
-    path: 'entities',
-    component: EntityManagementComponent
-  }
-];
+import { AdminRoutingModule } from './admin-routing.module';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { SystemSettingsComponent } from './system-settings/system-settings.component';
+import { AuditLogsComponent } from './audit-logs/audit-logs.component';
+
+// Material imports
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  declarations: [],
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    // Import standalone components
+    AdminDashboardComponent,
+    SystemSettingsComponent,
+    AuditLogsComponent
+  ]
 })
 export class AdminModule { } 

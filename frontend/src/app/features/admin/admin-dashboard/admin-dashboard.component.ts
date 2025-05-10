@@ -1,52 +1,61 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+
+interface AdminFeature {
+  title: string;
+  description: string;
+  icon: string;
+  route: string;
+  color: string;
+}
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    RouterModule
-  ],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule, RouterModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss']
 })
 export class AdminDashboardComponent {
-  adminModules = [
+  features: AdminFeature[] = [
     {
       title: 'User Management',
-      description: 'Add, edit, or delete users. Manage user roles and permissions.',
+      description: 'Manage users, roles, and permissions',
       icon: 'people',
       route: '/admin/users',
-      color: '#4285F4'
+      color: '#5c6bc0'
     },
     {
       title: 'Entity Management',
-      description: 'Manage entity hierarchies, add new locations, and edit details.',
-      icon: 'business',
+      description: 'Manage stores, kiosks, and other entities',
+      icon: 'store',
       route: '/admin/entities',
-      color: '#34A853'
+      color: '#26a69a'
     },
     {
       title: 'System Settings',
-      description: 'Configure system-wide settings and preferences.',
+      description: 'Configure system-wide settings and preferences',
       icon: 'settings',
       route: '/admin/settings',
-      color: '#FBBC05'
+      color: '#ec407a'
     },
     {
       title: 'Audit Logs',
-      description: 'View system activity and user action logs.',
-      icon: 'receipt',
-      route: '/admin/logs',
-      color: '#EA4335'
+      description: 'View system activity and user actions',
+      icon: 'history',
+      route: '/admin/audit-logs',
+      color: '#8d6e63'
     }
   ];
+
+  constructor(private router: Router) {}
+
+  navigateTo(route: string): void {
+    this.router.navigate([route]);
+  }
 } 

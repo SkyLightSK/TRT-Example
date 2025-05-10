@@ -1,0 +1,85 @@
+.admin-container {
+  padding: 20px;
+  
+  .admin-header {
+    margin-bottom: 20px;
+    
+    h1 {
+      margin: 0;
+    }
+  }
+  
+  .feature-banner {
+    display: flex;
+    align-items: center;
+    background-color: #fbbc05;
+    color: #333;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    
+    mat-icon {
+      margin-right: 10px;
+    }
+  }
+  
+  .settings-card {
+    padding: 0;
+    
+    mat-tabs {
+      padding: 16px;
+    }
+    
+    .settings-list {
+      padding: 16px 0;
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid #eee;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .setting-info {
+        flex: 1;
+        
+        h3 {
+          margin: 0 0 8px 0;
+          font-size: 16px;
+          font-weight: 500;
+        }
+        
+        .setting-description {
+          color: rgba(0, 0, 0, 0.6);
+          margin: 0;
+          font-size: 14px;
+        }
+      }
+      
+      .setting-control {
+        min-width: 200px;
+        display: flex;
+        justify-content: flex-end;
+        
+        mat-form-field {
+          width: 100%;
+        }
+      }
+    }
+    
+    mat-card-actions {
+      padding: 16px;
+      border-top: 1px solid #eee;
+      
+      button {
+        margin-left: 8px;
+      }
+    }
+  }
+} 

@@ -1,54 +1,104 @@
-<div class="user-list">
-  <div class="header">
+<div class="admin-container">
+  <div class="admin-header">
     <h1>User Management</h1>
-    <div class="actions">
-      <input type="text" placeholder="Search users..." class="search-input">
-      <button class="add-btn">Add User</button>
-    </div>
+    <button mat-raised-button color="primary" (click)="openUserDialog()">
+      <mat-icon>add</mat-icon>
+      Add User
+    </button>
   </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Roles</th>
-          <th>Impersonable Entities</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users">
-          <td>{{user.username}}</td>
-          <td>{{user.email}}</td>
-          <td>
-            <div class="role-badges">
-              <span class="role-badge" *ngFor="let role of user.roles">
-                {{role}}
-              </span>
-            </div>
-          </td>
-          <td>
-            <div class="entity-list">
-              <span class="entity-badge" *ngFor="let entity of user.impersonableEntities">
-                {{entity.name}}
-              </span>
-            </div>
-          </td>
-          <td>
-            <span class="status-badge" [ngClass]="user.status.toLowerCase()">
-              {{user.status}}
-            </span>
-          </td>
-          <td>
-            <button class="action-btn edit" (click)="onEdit(user)">Edit</button>
-            <button class="action-btn roles" (click)="onManageRoles(user)">Roles</button>
-            <button class="action-btn delete" (click)="onDelete(user)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
+  <mat-form-field class="filter-field">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Search users..." #input>
+  </mat-form-field>
+
+  <div class="table-container mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <!-- Username Column -->
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
+        <td mat-cell *matCellDef="let user">{{user.username}}</td>
+      </ng-container>
+
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+        <td mat-cell *matCellDef="let user">{{user.email}}</td>
+      </ng-container>
+
+      <!-- Roles Column -->
+      <ng-container matColumnDef="roles">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Roles</th>
+        <td mat-cell *matCellDef="let user">
+          <mat-chip-set>
+            <mat-chip *ngFor="let role of user.roles" color="primary" selected>
+              {{role}}
+            </mat-chip>
+          </mat-chip-set>
+        </td>
+      </ng-container>
+
+      <!-- Entities Column -->
+      <ng-container matColumnDef="entities">
+        <th mat-header-cell *matHeaderCellDef>Impersonable Entities</th>
+        <td mat-cell *matCellDef="let user">
+          <div class="entity-list">
+            {{getEntityNames(user.impersonableEntities)}}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let user">
+          <span class="status-badge" [ngClass]="user.status.toLowerCase()">
+            {{user.status}}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let user">
+          <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="User actions">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="openUserDialog(user)">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+            <button mat-menu-item (click)="openRolesDialog(user)">
+              <mat-icon>supervisor_account</mat-icon>
+              <span>Manage Roles</span>
+            </button>
+            <button mat-menu-item (click)="toggleStatus(user)">
+              <mat-icon>power_settings_new</mat-icon>
+              <span>{{user.status === 'Active' ? 'Deactivate' : 'Activate'}}</span>
+            </button>
+            <button mat-menu-item (click)="confirmDelete(user)">
+              <mat-icon>delete</mat-icon>
+              <span>Delete</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="6">No data matching the filter "{{filterValue}}"</td>
+      </tr>
     </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+
+    <div class="loading-shade" *ngIf="isLoading">
+      <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
   </div>
 </div> 

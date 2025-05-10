@@ -126,7 +126,17 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     const user = this.getCurrentUser();
-    return !!user && user.role === role;
+    
+    if (!user) {
+      return false;
+    }
+    
+    // Check if user has the admin role
+    if (role === 'ADMIN') {
+      return user.role.toUpperCase() === 'ADMIN';
+    }
+    
+    return user.role === role;
   }
 
   private handleAuthentication(authData: AuthResponse): void {

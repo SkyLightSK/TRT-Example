@@ -34,13 +34,15 @@ export class BudgetsSeeder extends BaseSeeder<Budget> {
     
     // Create budgets for each parent entity
     for (const entity of parentEntities) {
+      this.logger.log(`Creating budgets for entity: ${entity.name} (ID: ${entity.id})`);
+      
       // Current year budget - $500,000
       await this.createBudgetIfNotExists({
         name: `${entity.name} ${currentYear} Budget`,
         fiscalYear: currentYear,
         startDate: new Date(`${currentYear}-01-01`),
         endDate: new Date(`${currentYear}-12-31`),
-        totalAmount: 500000, // $500,000
+        totalAmount: 500000, // $500,000 as a number
         notes: `Annual technology budget for ${entity.name} for ${currentYear}`,
         entity: Promise.resolve(entity)
       });
@@ -51,7 +53,7 @@ export class BudgetsSeeder extends BaseSeeder<Budget> {
         fiscalYear: currentYear + 1,
         startDate: new Date(`${currentYear + 1}-01-01`),
         endDate: new Date(`${currentYear + 1}-12-31`),
-        totalAmount: 550000, // $550,000
+        totalAmount: 550000, // $550,000 as a number
         notes: `Annual technology budget for ${entity.name} for ${currentYear + 1}`,
         entity: Promise.resolve(entity)
       });
@@ -69,8 +71,11 @@ export class BudgetsSeeder extends BaseSeeder<Budget> {
     });
     
     if (!existingBudget) {
-      await this.budgetsRepository.save(budgetData);
-      this.logger.log(`Created budget: ${budgetData.name}`);
+      // Use create + save to ensure proper handling of relationships
+      const budget = this.budgetsRepository.create(budgetData);
+      const savedBudget = await this.budgetsRepository.save(budget);
+      const entityName = await budgetData.entity?.then(e => e.name);
+      this.logger.log(`Created budget: ${savedBudget.name} (ID: ${savedBudget.id}) for entity: ${entityName}`);
     } else {
       this.logger.log(`Budget ${budgetData.name} already exists, skipping`);
     }

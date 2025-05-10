@@ -30,6 +30,26 @@ export class BudgetsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('items')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all budget items' })
+  @ApiResponse({ status: 200, description: 'Return all budget items', type: [BudgetItem] })
+  findAllItems(): Promise<BudgetItem[]> {
+    return this.budgetsService.findAllItems();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('items/:id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get budget item by id' })
+  @ApiParam({ name: 'id', description: 'Budget Item ID' })
+  @ApiResponse({ status: 200, description: 'Return budget item by id', type: BudgetItem })
+  @ApiResponse({ status: 404, description: 'Budget item not found' })
+  findItem(@Param('id') id: string): Promise<BudgetItem> {
+    return this.budgetsService.findOneItem(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a budget by id' })
@@ -58,24 +78,5 @@ export class BudgetsController {
   @ApiResponse({ status: 200, description: 'Budget has been successfully deleted' })
   remove(@Param('id') id: string) {
     return this.budgetsService.remove(+id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('items')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all budget items' })
-  @ApiResponse({ status: 200, description: 'Return all budget items', type: [BudgetItem] })
-  findAllItems(): Promise<BudgetItem[]> {
-    return this.budgetsService.findAllItems();
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('items/:id')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get budget item by id' })
-  @ApiResponse({ status: 200, description: 'Return budget item by id', type: BudgetItem })
-  @ApiResponse({ status: 404, description: 'Budget item not found' })
-  findItem(@Param('id') id: string): Promise<BudgetItem> {
-    return this.budgetsService.findOneItem(+id);
   }
 } 

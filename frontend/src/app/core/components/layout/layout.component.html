@@ -8,13 +8,25 @@
       <a routerLink="/admin" routerLinkActive="active">Admin</a>
     </div>
     <div class="navbar-right">
-      <div class="entity-badge">
-        <span class="icon">🏬</span>
-        <span>Aaron, James D Jr</span>
-      </div>
-      <div class="user-profile">
-        <span class="user-name">Admin User</span>
-        <div class="avatar">A</div>
+      <div class="user-profile" (click)="toggleUserMenu()" [class.active]="userMenuOpen">
+        <span class="user-name">{{ (currentUser$ | async)?.username || 'Guest' }}</span>
+        <div class="avatar">{{ getFirstInitial((currentUser$ | async)?.username) }}</div>
+        <div class="user-menu" *ngIf="userMenuOpen">
+          <div class="user-menu-header">
+            <span class="user-role">{{ (currentUser$ | async)?.role || 'Not logged in' }}</span>
+          </div>
+          <div class="user-menu-items">
+            <a routerLink="/profile">
+              <span class="menu-icon">👤</span> Profile
+            </a>
+            <a routerLink="/settings">
+              <span class="menu-icon">⚙️</span> Settings
+            </a>
+            <button (click)="logout()">
+              <span class="menu-icon">🚪</span> Logout
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </nav>

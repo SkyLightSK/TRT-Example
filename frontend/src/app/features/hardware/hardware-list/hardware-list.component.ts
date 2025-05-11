@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule, MatTable, MatTableDataSource } from '@angular/material/table';
@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDialogModule, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
@@ -18,6 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Device, CreateDeviceDto, UpdateDeviceDto } from '../models/device.model';
 import { HardwareService } from '../services/hardware.service';
 import { DeviceFormComponent } from '../device-form/device-form.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-hardware-list',
@@ -41,6 +42,7 @@ import { DeviceFormComponent } from '../device-form/device-form.component';
     MatSortModule,
     MatTooltipModule
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './hardware-list.component.html',
   styleUrls: ['./hardware-list.component.scss']
 })
@@ -60,6 +62,9 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
   isLoading = false;
   filterValue = '';
 
+  // EOL warning threshold in days
+  private eolWarningThreshold = 90; 
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatTable) table!: MatTable<Device>;
@@ -75,39 +80,77 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    // Wait until view is initialized to attach paginator and sort
+    setTimeout(() => {
+      this.setupDataSource();
+    });
+  }
+
+  private setupDataSource(): void {
     if (this.dataSource) {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+      
+      // Custom filter predicate to search across multiple fields
+      this.dataSource.filterPredicate = (data: Device, filter: string): boolean => {
+        if (!data) return false;
+        
+        const filterValue = filter.toLowerCase().trim();
+        
+        return !!(
+          (data.nsn && data.nsn.toLowerCase().includes(filterValue)) || 
+          (data.type && data.type.toLowerCase().includes(filterValue)) || 
+          (data.manufacturer && data.manufacturer.toLowerCase().includes(filterValue)) || 
+          (data.model && data.model.toLowerCase().includes(filterValue)) || 
+          (data.location && data.location.toLowerCase().includes(filterValue)) || 
+          (data.status && data.status.toLowerCase().includes(filterValue))
+        );
+      };
     }
   }
 
   loadDevices(): void {
     this.isLoading = true;
-    this.hardwareService.getDevices().subscribe({
-      next: (devices) => {
-        console.log('Loaded devices:', devices);
-        this.dataSource.data = devices;
-        this.isLoading = false;
-        if (this.table) {
-          this.table.renderRows();
+    this.hardwareService.getDevices()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (devices) => {
+          console.log('Received devices:', devices);
+          this.dataSource.data = devices || [];
+          if (this.table) {
+            this.table.renderRows();
+          }
+          
+          // Reattach paginator and sort if they might have been lost
+          this.setupDataSource();
+        },
+        error: (error) => {
+          console.error('Error loading devices:', error);
+          this.snackBar.open('Error loading devices: ' + error.message, 'Close', { 
+            duration: 5000,
+            panelClass: 'error-snackbar'
+          });
         }
-      },
-      error: (error) => {
-        console.error('Error loading devices:', error);
-        this.snackBar.open('Error loading devices', 'Close', { duration: 3000 });
-        this.isLoading = false;
-      }
-    });
+      });
   }
 
   openDeviceForm(device?: Device): void {
-    const dialogRef = this.dialog.open(DeviceFormComponent, {
-      width: '600px',
-      data: device ? { ...device } : null
-    });
+    const dialogConfig: MatDialogConfig = {
+      width: '700px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      disableClose: true,
+      autoFocus: true,
+      restoreFocus: true,
+      data: device ? { ...device } : null,
+      panelClass: ['device-form-dialog', 'mat-elevation-z4']
+    };
+    
+    const dialogRef = this.dialog.open(DeviceFormComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log('Form result:', result);
         if (device) {
           this.updateDevice(device.id, result);
         } else {
@@ -118,59 +161,151 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
   }
 
   createDevice(device: CreateDeviceDto): void {
-    this.hardwareService.createDevice(device).subscribe({
-      next: (newDevice) => {
-        const currentData = this.dataSource.data;
-        this.dataSource.data = [...currentData, newDevice];
-        this.snackBar.open('Device created successfully', 'Close', { duration: 3000 });
-      },
-      error: (error) => {
-        console.error('Error creating device:', error);
-        this.snackBar.open('Error creating device', 'Close', { duration: 3000 });
-      }
-    });
+    this.isLoading = true;
+    this.hardwareService.createDevice(device)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (newDevice) => {
+          console.log('Created device:', newDevice);
+          const currentData = this.dataSource.data || [];
+          this.dataSource.data = [...currentData, newDevice];
+          
+          // Refresh table rendering
+          if (this.table) {
+            this.table.renderRows();
+          }
+          
+          this.snackBar.open('Device created successfully', 'Close', { 
+            duration: 3000,
+            panelClass: 'success-snackbar'
+          });
+        },
+        error: (error) => {
+          console.error('Error creating device:', error);
+          this.snackBar.open('Error creating device: ' + error.message, 'Close', { 
+            duration: 5000,
+            panelClass: 'error-snackbar'
+          });
+        }
+      });
   }
 
   updateDevice(id: number, device: UpdateDeviceDto): void {
-    this.hardwareService.updateDevice(id, device).subscribe({
-      next: (updatedDevice) => {
-        const currentData = this.dataSource.data;
-        const index = currentData.findIndex(d => d.id === id);
-        if (index !== -1) {
-          currentData[index] = updatedDevice;
-          this.dataSource.data = [...currentData];
+    this.isLoading = true;
+    this.hardwareService.updateDevice(id, device)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (updatedDevice) => {
+          console.log('Updated device:', updatedDevice);
+          const currentData = this.dataSource.data || [];
+          const index = currentData.findIndex(d => d.id === id);
+          if (index !== -1) {
+            currentData[index] = updatedDevice;
+            this.dataSource.data = [...currentData];
+          }
+          
+          // Refresh table rendering
+          if (this.table) {
+            this.table.renderRows();
+          }
+          
+          this.snackBar.open('Device updated successfully', 'Close', { 
+            duration: 3000,
+            panelClass: 'success-snackbar'
+          });
+        },
+        error: (error) => {
+          console.error('Error updating device:', error);
+          this.snackBar.open('Error updating device: ' + error.message, 'Close', { 
+            duration: 5000,
+            panelClass: 'error-snackbar'
+          });
         }
-        this.snackBar.open('Device updated successfully', 'Close', { duration: 3000 });
-      },
-      error: (error) => {
-        console.error('Error updating device:', error);
-        this.snackBar.open('Error updating device', 'Close', { duration: 3000 });
+      });
+  }
+
+  deleteDevice(id: number): void {
+    const confirmDialog = this.dialog.open(DeviceDeleteConfirmComponent, {
+      width: '400px',
+      data: { deviceId: id },
+      disableClose: true
+    });
+
+    confirmDialog.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.isLoading = true;
+        this.hardwareService.deleteDevice(id)
+          .pipe(finalize(() => this.isLoading = false))
+          .subscribe({
+            next: () => {
+              const filteredData = this.dataSource.data.filter(d => d.id !== id);
+              this.dataSource.data = filteredData;
+              
+              // Refresh table rendering
+              if (this.table) {
+                this.table.renderRows();
+              }
+              
+              this.snackBar.open('Device deleted successfully', 'Close', { 
+                duration: 3000,
+                panelClass: 'success-snackbar'
+              });
+            },
+            error: (error) => {
+              console.error('Error deleting device:', error);
+              this.snackBar.open('Error deleting device: ' + error.message, 'Close', { 
+                duration: 5000,
+                panelClass: 'error-snackbar'
+              });
+            }
+          });
       }
     });
   }
 
-  deleteDevice(id: number): void {
-    if (confirm('Are you sure you want to delete this device?')) {
-      this.hardwareService.deleteDevice(id).subscribe({
-        next: () => {
-          this.dataSource.data = this.dataSource.data.filter(d => d.id !== id);
-          this.snackBar.open('Device deleted successfully', 'Close', { duration: 3000 });
-        },
-        error: (error) => {
-          console.error('Error deleting device:', error);
-          this.snackBar.open('Error deleting device', 'Close', { duration: 3000 });
-        }
-      });
-    }
-  }
-
   applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.filterValue = filterValue.trim().toLowerCase();
+    const inputElement = event.target as HTMLInputElement;
+    this.filterValue = inputElement.value.trim().toLowerCase();
     this.dataSource.filter = this.filterValue;
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
   }
+
+  isEolApproaching(device: Device): boolean {
+    if (!device || !device.endOfLife) {
+      return false;
+    }
+    
+    const endOfLifeDate = new Date(device.endOfLife);
+    const today = new Date();
+    const daysUntilEol = Math.floor((endOfLifeDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    
+    return daysUntilEol <= this.eolWarningThreshold && daysUntilEol > 0;
+  }
+}
+
+// Delete confirmation dialog component
+@Component({
+  selector: 'app-device-delete-confirm',
+  template: `
+    <h2 mat-dialog-title>Confirm Delete</h2>
+    <mat-dialog-content>
+      Are you sure you want to delete this device? This action cannot be undone.
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button [mat-dialog-close]="false">Cancel</button>
+      <button mat-raised-button color="warn" [mat-dialog-close]="true">Delete</button>
+    </mat-dialog-actions>
+  `,
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule
+  ]
+})
+export class DeviceDeleteConfirmComponent {
+  constructor() {}
 } 

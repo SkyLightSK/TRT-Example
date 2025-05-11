@@ -1,77 +1,97 @@
-<h2 mat-dialog-title>{{isEditMode ? 'Edit' : 'Add'}} Device</h2>
+<div class="device-form-container">
+  <header class="form-header">
+    <h2>{{isEditMode ? 'Edit' : 'Add New'}} Device</h2>
+    <p class="form-subtitle">{{isEditMode ? 'Update device information' : 'Enter device details to add to inventory'}}</p>
+  </header>
 
-<form [formGroup]="deviceForm" (ngSubmit)="onSubmit()">
-  <mat-dialog-content>
-    <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>NSN</mat-label>
-        <input matInput formControlName="nsn" placeholder="Enter 13-digit NSN">
-        <mat-error *ngIf="deviceForm.get('nsn')?.hasError('required')">NSN is required</mat-error>
-        <mat-error *ngIf="deviceForm.get('nsn')?.hasError('pattern')">NSN must be 13 digits</mat-error>
-      </mat-form-field>
+  <form [formGroup]="deviceForm" (ngSubmit)="onSubmit()">
+    <div class="form-content">
+      <div class="section-title">Basic Information</div>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>NSN</mat-label>
+          <input matInput formControlName="nsn">
+          <mat-hint>13-digit National Stock Number</mat-hint>
+          <mat-error *ngIf="deviceForm.get('nsn')?.hasError('required')">NSN is required</mat-error>
+          <mat-error *ngIf="deviceForm.get('nsn')?.hasError('pattern')">NSN must be 13 digits</mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Type</mat-label>
-        <input matInput formControlName="type" placeholder="Enter device type">
-        <mat-error *ngIf="deviceForm.get('type')?.hasError('required')">Type is required</mat-error>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option *ngFor="let type of deviceTypes" [value]="type">
+              {{type}}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Select device type</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Manufacturer</mat-label>
+          <input matInput formControlName="manufacturer">
+          <mat-error *ngIf="deviceForm.get('manufacturer')?.hasError('required')">Manufacturer is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Model</mat-label>
+          <input matInput formControlName="model">
+          <mat-error *ngIf="deviceForm.get('model')?.hasError('required')">Model is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="section-title">Additional Details</div>
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Location</mat-label>
+          <input matInput formControlName="location">
+          <mat-hint>Physical location of the device</mat-hint>
+          <mat-error *ngIf="deviceForm.get('location')?.hasError('required')">Location is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>End of Life</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="endOfLife" [min]="minDate">
+          <mat-hint>Expected end of life date</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="deviceForm.get('endOfLife')?.hasError('required')">End of Life date is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let status of statusOptions" [value]="status">
+              <span [class]="status.toLowerCase()">{{status}}</span>
+            </mat-option>
+          </mat-select>
+          <mat-hint>Current operational status</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Eligible for Upgrade</mat-label>
+          <mat-select formControlName="eligibleUpgrade">
+            <mat-option [value]="true">Yes</mat-option>
+            <mat-option [value]="false">No</mat-option>
+          </mat-select>
+          <mat-hint>Whether this device can be upgraded</mat-hint>
+        </mat-form-field>
+      </div>
     </div>
 
-    <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Manufacturer</mat-label>
-        <input matInput formControlName="manufacturer" placeholder="Enter manufacturer">
-        <mat-error *ngIf="deviceForm.get('manufacturer')?.hasError('required')">Manufacturer is required</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Model</mat-label>
-        <input matInput formControlName="model" placeholder="Enter model">
-        <mat-error *ngIf="deviceForm.get('model')?.hasError('required')">Model is required</mat-error>
-      </mat-form-field>
+    <div class="form-actions">
+      <button type="button" mat-button class="cancel-button" (click)="onCancel()">
+        Cancel
+      </button>
+      <button type="submit" mat-raised-button color="primary" class="submit-button" [disabled]="deviceForm.invalid">
+        <mat-icon>{{isEditMode ? 'save' : 'add'}}</mat-icon>
+        {{isEditMode ? 'Update Device' : 'Create Device'}}
+      </button>
     </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Location</mat-label>
-        <input matInput formControlName="location" placeholder="Enter location">
-        <mat-error *ngIf="deviceForm.get('location')?.hasError('required')">Location is required</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>End of Life</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="endOfLife">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-        <mat-error *ngIf="deviceForm.get('endOfLife')?.hasError('required')">End of Life date is required</mat-error>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Status</mat-label>
-        <mat-select formControlName="status">
-          <mat-option *ngFor="let status of statusOptions" [value]="status">
-            {{status}}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="deviceForm.get('status')?.hasError('required')">Status is required</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Eligible for Upgrade</mat-label>
-        <mat-select formControlName="eligibleUpgrade">
-          <mat-option [value]="true">Yes</mat-option>
-          <mat-option [value]="false">No</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-  </mat-dialog-content>
-
-  <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">Cancel</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="!deviceForm.valid">
-      {{isEditMode ? 'Update' : 'Create'}}
-    </button>
-  </mat-dialog-actions>
-</form> 
+  </form>
+</div> 

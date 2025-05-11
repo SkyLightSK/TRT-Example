@@ -2,45 +2,257 @@
 
 :host {
   display: block;
+  max-height: 90vh;
+  overflow: hidden;
 }
 
-h2 {
-  margin: 0;
-  color: #333;
-  font-size: 20px;
+.device-form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-header {
+  padding: 24px 32px;
+  background-color: #f5f7fa;
+  border-bottom: 1px solid #eaedf0;
+
+  h2 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .form-subtitle {
+    margin: 8px 0 0;
+    color: #6b7c93;
+    font-size: 16px;
+    font-weight: 400;
+  }
+}
+
+.form-content {
+  padding: 24px 32px;
+  overflow-y: auto;
+  max-height: 65vh;
+}
+
+.section-title {
+  margin: 0 0 16px;
+  color: #2c3e50;
+  font-size: 18px;
   font-weight: 500;
-}
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eaedf0;
 
-mat-dialog-content {
-  padding: 20px 0;
-  min-width: 600px;
+  &:not(:first-child) {
+    margin-top: 24px;
+  }
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 20px;
+}
 
-  mat-form-field {
-    width: 100%;
+// Enhanced form field styling
+.form-field {
+  width: 100%;
+
+  ::ng-deep {
+    .mat-form-field-wrapper {
+      margin: 0;
+    }
+
+    .mat-form-field-flex {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #f0f2f5;
+      }
+    }
+
+    .mat-form-field-outline {
+      color: #d0d7de;
+    }
+    
+    .mat-form-field-outline-thick {
+      color: #3498db;
+    }
+    
+    .mat-form-field-outline-start,
+    .mat-form-field-outline-gap,
+    .mat-form-field-outline-end {
+      border-width: 1px;
+      border-radius: 8px;
+    }
+
+    .mat-form-field-infix {
+      padding: 0.75em 0 0.75em;
+      width: auto;
+    }
+
+    .mat-select-arrow {
+      color: #6b7c93;
+    }
+
+    input.mat-input-element, 
+    .mat-select-value-text {
+      color: #2c3e50;
+    }
+    
+    input.mat-input-element {
+      margin-top: 0.2em;
+      
+      &::placeholder {
+        color: #a0aec0;
+        font-size: 14px;
+        opacity: 1;
+      }
+    }
+
+    .mat-form-field-label {
+      color: #6b7c93;
+      font-size: 14px;
+    }
+    
+    .mat-form-field-label-wrapper {
+      top: -0.5em;
+      padding-top: 0.5em;
+    }
+
+    .mat-form-field-subscript-wrapper {
+      font-size: 12px;
+      margin-top: 0.5em;
+    }
+
+    .mat-hint {
+      color: #8a94a6;
+    }
+    
+    .mat-form-field-required-marker {
+      color: #e53e3e;
+    }
+  }
+
+  &.mat-focused {
+    ::ng-deep {
+      .mat-form-field-label {
+        color: #3498db;
+      }
+      
+      .mat-form-field-outline-thick {
+        color: #3498db;
+      }
+    }
   }
 }
 
-mat-dialog-actions {
-  padding: 20px 0 0;
-  margin: 0;
-  gap: 10px;
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 20px 32px;
+  border-top: 1px solid #eaedf0;
+  background-color: #f5f7fa;
+}
+
+.cancel-button {
+  color: #6b7c93;
+  font-weight: 500;
+  
+  &:hover {
+    background-color: rgba(107, 124, 147, 0.08);
+  }
+}
+
+.submit-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  height: 44px;
+  font-weight: 500;
+  border-radius: 6px;
+  background-color: #3498db;
+  transition: all 0.2s ease;
+  
+  &:hover:not([disabled]) {
+    background-color: #2980b9;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    transform: translateY(-1px);
+  }
+  
+  &:active:not([disabled]) {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.2);
+  }
+  
+  &[disabled] {
+    background-color: rgba(52, 152, 219, 0.6);
+  }
+}
+
+// Status colors in text
+::ng-deep {
+  .active {
+    color: #27ae60;
+  }
+  
+  .required {
+    color: #f39c12;
+  }
+  
+  .retired {
+    color: #95a5a6;
+  }
 }
 
 // Responsive styles
-@media screen and (max-width: 600px) {
-  mat-dialog-content {
-    min-width: auto;
+@media screen and (max-width: 768px) {
+  .form-header {
+    padding: 20px 24px;
+    
+    h2 {
+      font-size: 20px;
+    }
+    
+    .form-subtitle {
+      font-size: 14px;
+    }
   }
-
+  
+  .form-content {
+    padding: 20px 24px;
+  }
+  
   .form-row {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .form-actions {
+    padding: 16px 24px;
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+  
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+    margin: 0;
   }
 } 

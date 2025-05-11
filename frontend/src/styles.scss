@@ -1,3 +1,5 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
 /* You can add global styles to this file, and also import other style files */
 
 /* Global Reset */
@@ -58,5 +60,168 @@ body {
 @media (min-width: 1200px) {
   .container {
     max-width: 1140px;
+  }
+}
+
+/* Global Form Field Styling */
+.mat-form-field-appearance-outline {
+  .mat-form-field-outline {
+    color: #d0d7de;
+  }
+  
+  .mat-form-field-outline-thick {
+    color: #3498db;
+  }
+  
+  .mat-form-field-infix {
+    padding: 0.75em 0 0.75em;
+  }
+  
+  input.mat-input-element {
+    margin-top: 0.2em;
+  }
+  
+  .mat-form-field-label {
+    color: #6b7c93;
+  }
+  
+  &.mat-focused {
+    .mat-form-field-outline-thick {
+      color: #3498db;
+    }
+    
+    .mat-form-field-label {
+      color: #3498db;
+    }
+  }
+  
+  .mat-form-field-required-marker {
+    color: #e53e3e;
+  }
+  
+  &.mat-form-field-invalid {
+    .mat-form-field-outline-thick {
+      color: #f44336;
+    }
+    
+    .mat-form-field-label {
+      color: #f44336;
+    }
+  }
+}
+
+/* Input Placeholder Styling */
+::placeholder {
+  color: #a0aec0 !important;
+  font-size: 14px !important;
+  opacity: 1 !important;
+}
+
+:-ms-input-placeholder {
+  color: #a0aec0 !important;
+  font-size: 14px !important;
+}
+
+::-ms-input-placeholder {
+  color: #a0aec0 !important;
+  font-size: 14px !important;
+}
+
+/* Button Styling */
+.mat-button, .mat-raised-button, .mat-stroked-button, .mat-flat-button {
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.mat-raised-button.mat-primary {
+  background-color: #3498db;
+}
+
+.mat-raised-button:not([disabled]) {
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Dialog Styling */
+.mat-dialog-container {
+  border-radius: 8px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Tooltip Styling */
+.mat-tooltip {
+  background-color: rgba(44, 62, 80, 0.95) !important;
+  color: white !important;
+  font-size: 14px !important;
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+  max-width: 250px !important;
+}
+
+/* Mat Table Styling */
+.mat-table {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Snackbar Styling */
+.success-snackbar {
+  background-color: #4CAF50;
+  color: white;
+  
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}
+
+.error-snackbar {
+  background-color: #F44336;
+  color: white;
+  
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}
+
+/* Status Colors */
+.active {
+  color: #27ae60;
+}
+
+.required {
+  color: #2196F3;
+}
+
+.retired {
+  color: #95a5a6;
+}
+
+// Add additional global styles to fix dialog and tooltip appearance
+
+// Device form dialog styles
+.device-form-dialog {
+  .mat-dialog-container {
+    padding: 24px;
+    max-height: 90vh;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+}
+
+// Datepicker styles
+.mat-datepicker-content {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+  
+  .mat-calendar {
+    padding: 8px;
   }
 }

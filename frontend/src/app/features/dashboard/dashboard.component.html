@@ -2,211 +2,26 @@
   <div class="dashboard-header">
     <h1>Dashboard</h1>
     <div class="actions">
-      <button class="btn btn-primary" (click)="refreshData()">Refresh Data</button>
+      <button class="btn btn-primary" (click)="refreshDashboard()">Refresh Data</button>
     </div>
   </div>
 
-  <div *ngIf="loading" class="loading-container">
+  <div class="dashboard-grid">
+    <!-- Budget Overview Widget -->
+    <app-budget-overview [budgetStats]="budgetStats"></app-budget-overview>
+
+    <!-- Device Status Widget -->
+    <app-device-status [deviceStatus]="deviceStatus"></app-device-status>
+
+    <!-- Notifications Widget -->
+    <app-recent-notifications [notifications]="notifications" [loading]="loading.notifications"></app-recent-notifications>
+
+    <!-- Upcoming EOL Widget -->
+    <app-upcoming-eol [upcomingEolDevices]="upcomingEolDevices" [loading]="loading.upcomingEol"></app-upcoming-eol>
+  </div>
+
+  <div *ngIf="loading.budget && loading.deviceStatus && loading.notifications && loading.upcomingEol" class="loading-container">
     <div class="loading-spinner"></div>
     <p>Loading dashboard data...</p>
-  </div>
-
-  <div *ngIf="!loading" class="dashboard-grid">
-    <!-- Budget Overview Card -->
-    <div class="card budget-overview">
-      <div class="card-header">
-        <h2>Budget Overview</h2>
-        <div class="budget-meta">
-          <span class="badge system-wide">System-wide</span>
-        </div>
-      </div>
-      <div class="card-content">
-        <div class="metrics">
-          <div class="metric">
-            <div class="metric-value">{{ formatCurrency(budgetStats?.totalAllocated || 0) }}</div>
-            <div class="metric-label">Total Allocated</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value">{{ formatCurrency(budgetStats?.totalSpent || 0) }}</div>
-            <div class="metric-label">Total Spent</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value">{{ budgetStats?.overallUtilization || 0 }}%</div>
-            <div class="metric-label">Overall Utilization</div>
-          </div>
-        </div>
-
-        <div class="yearly-trends">
-          <div class="section-header">
-            <h3>Yearly Budget Trends</h3>
-            <div class="year-filters">
-              <span>Filter years:</span>
-              <div class="checkbox-group">
-                <label *ngFor="let year of availableYears" class="year-checkbox">
-                  <input type="checkbox" 
-                         [checked]="selectedYears.includes(year)"
-                         (change)="toggleYearFilter(year)">
-                  {{ year }}
-                </label>
-              </div>
-            </div>
-          </div>
-          
-          <div class="chart-container">
-            <div class="bar-chart">
-              <div class="chart-bars">
-                <div class="year-column" *ngFor="let trend of getFilteredTrends()">
-                  <div class="bar-container">
-                    <div class="budget-bar" [style.height]="getTrendBarHeight(trend)">
-                      <div class="spent-bar" [style.height]="getSpentBarHeight(trend)"></div>
-                    </div>
-                  </div>
-                  <div class="year-label">{{ trend.year }}</div>
-                </div>
-              </div>
-              <div class="chart-legend">
-                <div class="legend-item">
-                  <div class="legend-color total-budget"></div>
-                  <div class="legend-label">Total Budget</div>
-                </div>
-                <div class="legend-item">
-                  <div class="legend-color spent-budget"></div>
-                  <div class="legend-label">Spent Amount</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="trends-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Fiscal Year</th>
-                  <th>Total Budget</th>
-                  <th>Spent to Date</th>
-                  <th>Utilization</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let trend of getFilteredTrends()">
-                  <td>{{ trend.year }}</td>
-                  <td>{{ formatCurrency(trend.totalBudget) }}</td>
-                  <td>{{ formatCurrency(trend.spentToDate) }}</td>
-                  <td>
-                    <div class="utilization-cell">
-                      <div class="progress-mini">
-                        <div class="progress" [style.width]="trend.utilization + '%'"></div>
-                      </div>
-                      <span>{{ trend.utilization }}%</span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a routerLink="/budget" class="link-btn">View Budget Details</a>
-      </div>
-    </div>
-
-    <!-- Device Status Card -->
-    <div class="card device-status">
-      <div class="card-header">
-        <h2>Device Status</h2>
-        <span class="badge">All Locations</span>
-      </div>
-      <div class="card-content">
-        <div class="status-grid">
-          <div class="status-item">
-            <div class="status-count">{{ deviceStatusSummary?.active || 0 }}</div>
-            <div class="status-label active">Active</div>
-          </div>
-          <div class="status-item">
-            <div class="status-count">{{ deviceStatusSummary?.needsAttention || 0 }}</div>
-            <div class="status-label warning">Needs Attention</div>
-          </div>
-          <div class="status-item">
-            <div class="status-count">{{ deviceStatusSummary?.critical || 0 }}</div>
-            <div class="status-label danger">Critical</div>
-          </div>
-          <div class="status-item">
-            <div class="status-count">{{ deviceStatusSummary?.endOfLife || 0 }}</div>
-            <div class="status-label neutral">End of Life</div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a routerLink="/hardware" class="link-btn">View All Devices</a>
-      </div>
-    </div>
-
-    <!-- Notifications Card -->
-    <div class="card notifications">
-      <div class="card-header">
-        <h2>Recent Notifications</h2>
-      </div>
-      <div class="card-content">
-        <div class="notification-list">
-          <div class="notification {{ notification.type }}" *ngFor="let notification of recentNotifications">
-            <div class="notification-icon">
-              <span *ngIf="notification.type === 'warning'">⚠️</span>
-              <span *ngIf="notification.type === 'info'">ℹ️</span>
-              <span *ngIf="notification.type === 'danger'">🚨</span>
-            </div>
-            <div class="notification-content">
-              <div class="notification-title">{{ notification.title }}</div>
-              <div class="notification-message">{{ notification.message }}</div>
-              <div class="notification-time">{{ getTimeAgo(notification.createdAt) }}</div>
-            </div>
-          </div>
-          
-          <div class="empty-state" *ngIf="recentNotifications.length === 0">
-            <p>No recent notifications</p>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a routerLink="/notifications" class="link-btn">View All Notifications</a>
-      </div>
-    </div>
-
-    <!-- Upcoming End of Life Card -->
-    <div class="card upcoming-eol">
-      <div class="card-header">
-        <h2>Upcoming End of Life</h2>
-      </div>
-      <div class="card-content">
-        <table class="eol-table" *ngIf="upcomingEolDevices.length > 0">
-          <thead>
-            <tr>
-              <th>Device</th>
-              <th>Location</th>
-              <th>EOL Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let device of upcomingEolDevices">
-              <td>{{ device.manufacturer }} {{ device.model }}</td>
-              <td>{{ device.location }}</td>
-              <td>{{ formatDate(device.endOfLife) }}</td>
-              <td>
-                <span class="badge {{ getEolStatusClass(getDaysUntilEol(device.endOfLife)) }}">
-                  {{ getDaysUntilEol(device.endOfLife) }} days
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="empty-state" *ngIf="upcomingEolDevices.length === 0">
-          <p>No devices approaching end of life in the next 90 days</p>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a routerLink="/hardware" class="link-btn">View All Devices</a>
-      </div>
-    </div>
   </div>
 </div> 

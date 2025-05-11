@@ -1,0 +1,168 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.eol-widget {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  
+  .badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    
+    &.system-wide {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+  }
+}
+
+.card-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.eol-devices-list {
+  margin: 0 -1rem;
+}
+
+.eol-device-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #f9f9f9;
+  }
+}
+
+.device-info {
+  flex: 1;
+  min-width: 0;
+  padding-right: 0.5rem;
+  
+  .device-name {
+    margin: 0 0 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .device-model {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #757575;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.eol-info {
+  text-align: right;
+  white-space: nowrap;
+  
+  .eol-date {
+    font-size: 0.75rem;
+    color: #616161;
+    margin-bottom: 0.25rem;
+  }
+  
+  .eol-countdown {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    
+    &.critical {
+      background-color: rgba(244, 67, 54, 0.1);
+      color: #f44336;
+    }
+    
+    &.warning {
+      background-color: rgba(255, 152, 0, 0.1);
+      color: #ff9800;
+    }
+    
+    &.normal {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+    }
+  }
+}
+
+.empty-state, .loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: #9e9e9e;
+  text-align: center;
+  
+  .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+  
+  .loading-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 3px solid #1976d2;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.card-footer {
+  margin-top: 1rem;
+  text-align: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+  
+  .link-btn {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

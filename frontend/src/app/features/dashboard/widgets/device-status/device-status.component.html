@@ -1,0 +1,61 @@
+<div class="card device-status">
+  <div class="card-header">
+    <h2>Device Status</h2>
+    <span class="badge system-wide">System-wide</span>
+  </div>
+  <div class="card-content">
+    <div class="status-summary">
+      <div class="total-devices">
+        <div class="total-value">{{ totalDevices }}</div>
+        <div class="total-label">Total Devices</div>
+      </div>
+      <div class="status-chart">
+        <div class="donut-chart">
+          <svg viewBox="0 0 36 36" class="circular-chart">
+            <circle class="donut-ring" cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke="#eeeeee" stroke-width="1"></circle>
+            
+            <!-- Online segment (green) -->
+            <circle *ngIf="deviceStatus?.online" class="donut-segment" [style.stroke]="getStatusColor('Online')"
+              cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke-width="3"
+              [style.stroke-dasharray]="getPercentage(deviceStatus?.online || 0) + ' ' + (100 - getPercentage(deviceStatus?.online || 0))"
+              stroke-dashoffset="25"></circle>
+            
+            <!-- Maintenance segment (orange) -->
+            <circle *ngIf="deviceStatus?.maintenance" class="donut-segment" [style.stroke]="getStatusColor('Maintenance')"
+              cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke-width="3"
+              [style.stroke-dasharray]="getPercentage(deviceStatus?.maintenance || 0) + ' ' + (100 - getPercentage(deviceStatus?.maintenance || 0))"
+              [style.stroke-dashoffset]="25 - getPercentage(deviceStatus?.online || 0)"></circle>
+            
+            <!-- Offline segment (red) -->
+            <circle *ngIf="deviceStatus?.offline" class="donut-segment" [style.stroke]="getStatusColor('Offline')"
+              cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke-width="3"
+              [style.stroke-dasharray]="getPercentage(deviceStatus?.offline || 0) + ' ' + (100 - getPercentage(deviceStatus?.offline || 0))"
+              [style.stroke-dashoffset]="25 - getPercentage(deviceStatus?.online || 0) - getPercentage(deviceStatus?.maintenance || 0)"></circle>
+            
+            <!-- Unknown segment (grey) -->
+            <circle *ngIf="deviceStatus?.unknown" class="donut-segment" [style.stroke]="getStatusColor('Unknown')"
+              cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke-width="3"
+              [style.stroke-dasharray]="getPercentage(deviceStatus?.unknown || 0) + ' ' + (100 - getPercentage(deviceStatus?.unknown || 0))"
+              [style.stroke-dashoffset]="25 - getPercentage(deviceStatus?.online || 0) - getPercentage(deviceStatus?.maintenance || 0) - getPercentage(deviceStatus?.offline || 0)"></circle>
+          </svg>
+        </div>
+      </div>
+    </div>
+    
+    <div class="status-breakdown">
+      <div class="status-item" *ngFor="let item of statusData">
+        <div class="status-label-group">
+          <div class="status-color" [style.background-color]="item.color"></div>
+          <div class="status-label">{{ item.label }}</div>
+        </div>
+        <div class="status-value">
+          <span class="status-count">{{ item.count }}</span>
+          <span class="status-percentage">({{ getPercentage(item.count) }}%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <a routerLink="/devices" class="link-btn">View All Devices</a>
+  </div>
+</div>

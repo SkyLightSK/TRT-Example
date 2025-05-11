@@ -1,0 +1,56 @@
+<div class="card notifications-widget">
+  <div class="card-header">
+    <h2>Recent Notifications</h2>
+    <div class="filter-tabs">
+      <button 
+        class="filter-tab" 
+        [class.active]="activeFilter === 'all'"
+        (click)="applyFilter('all')">
+        All
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="activeFilter === 'unread'"
+        (click)="applyFilter('unread')">
+        Unread
+      </button>
+    </div>
+  </div>
+  
+  <div class="card-content">
+    <div class="notifications-list" *ngIf="!loading && filteredNotifications.length > 0">
+      <div 
+        class="notification-item" 
+        *ngFor="let notification of filteredNotifications"
+        [class.unread]="!notification.read"
+        [routerLink]="notification.link || '/notifications'">
+        
+        <div class="notification-icon" [ngClass]="getTypeClass(notification.type)">
+          <mat-icon>{{ getTypeIcon(notification.type) }}</mat-icon>
+        </div>
+        
+        <div class="notification-content">
+          <div class="notification-header">
+            <h3 class="notification-title">{{ notification.title }}</h3>
+            <span class="notification-time">{{ getRelativeTime(notification.timestamp) }}</span>
+          </div>
+          <p class="notification-message">{{ notification.message }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="empty-state" *ngIf="!loading && filteredNotifications.length === 0">
+      <mat-icon class="empty-icon">notifications_off</mat-icon>
+      <p class="empty-message">No {{ activeFilter === 'unread' ? 'unread ' : '' }}notifications</p>
+    </div>
+    
+    <div class="loading-state" *ngIf="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading notifications...</p>
+    </div>
+  </div>
+  
+  <div class="card-footer">
+    <a routerLink="/notifications" class="link-btn">View All Notifications</a>
+  </div>
+</div>

@@ -1,0 +1,242 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.budget-overview {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+}
+
+.budget-meta {
+  display: flex;
+  gap: 0.5rem;
+  
+  .badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .system-wide {
+    background-color: #e3f2fd;
+    color: #1976d2;
+  }
+}
+
+.card-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.metrics {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  
+  .metric {
+    text-align: center;
+    flex: 1;
+    padding: 0.75rem;
+    
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #1976d2;
+      margin-bottom: 0.25rem;
+    }
+    
+    .metric-label {
+      font-size: 0.875rem;
+      color: #616161;
+    }
+  }
+}
+
+.yearly-trends {
+  margin-top: 1rem;
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
+  
+  .year-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    
+    .checkbox-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .year-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+}
+
+.chart-container {
+  margin: 1.5rem 0;
+}
+
+.bar-chart {
+  .chart-bars {
+    display: flex;
+    justify-content: space-around;
+    height: 200px;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+    
+    .year-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .bar-container {
+      height: 180px;
+      display: flex;
+      align-items: flex-end;
+      width: 40px;
+    }
+    
+    .budget-bar {
+      width: 40px;
+      background-color: rgba(25, 118, 210, 0.2);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      min-height: 4px;
+    }
+    
+    .spent-bar {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background-color: rgba(25, 118, 210, 0.8);
+      border-radius: 0 0 4px 4px;
+      min-height: 4px;
+    }
+    
+    .year-label {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+  
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      
+      &.total-budget {
+        background-color: rgba(25, 118, 210, 0.2);
+      }
+      
+      &.spent-budget {
+        background-color: rgba(25, 118, 210, 0.8);
+      }
+    }
+  }
+}
+
+.trends-table {
+  margin-top: 1.5rem;
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    th {
+      font-weight: 500;
+      color: #616161;
+    }
+    
+    .utilization-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      
+      .progress-mini {
+        width: 60px;
+        height: 6px;
+        background-color: #f5f5f5;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      
+      .progress {
+        height: 100%;
+        background-color: #1976d2;
+        border-radius: 3px;
+      }
+    }
+  }
+}
+
+.card-footer {
+  margin-top: 1rem;
+  text-align: center;
+  
+  .link-btn {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

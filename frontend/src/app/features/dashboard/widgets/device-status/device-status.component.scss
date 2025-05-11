@@ -1,0 +1,147 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.device-status {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  
+  .badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    
+    &.system-wide {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+  }
+}
+
+.card-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.status-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  
+  .total-devices {
+    text-align: center;
+    padding: 0 1.5rem;
+    
+    .total-value {
+      font-size: 2rem;
+      font-weight: 500;
+      color: #1976d2;
+    }
+    
+    .total-label {
+      font-size: 0.875rem;
+      color: #616161;
+      margin-top: 0.25rem;
+    }
+  }
+  
+  .status-chart {
+    flex: 0 0 150px;
+  }
+}
+
+.donut-chart {
+  width: 150px;
+  height: 150px;
+  
+  .circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  .donut-ring {
+    stroke: #eeeeee;
+    stroke-width: 1;
+  }
+  
+  .donut-segment {
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: stroke-dasharray 0.3s ease;
+  }
+}
+
+.status-breakdown {
+  margin-top: 1rem;
+  
+  .status-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    margin-bottom: 0.5rem;
+    
+    .status-label-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .status-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .status-label {
+      font-size: 0.875rem;
+    }
+    
+    .status-value {
+      font-size: 0.875rem;
+      
+      .status-count {
+        font-weight: 500;
+      }
+      
+      .status-percentage {
+        color: #757575;
+        margin-left: 0.25rem;
+      }
+    }
+  }
+}
+
+.card-footer {
+  margin-top: 1rem;
+  text-align: center;
+  
+  .link-btn {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

@@ -1,3 +1,5 @@
+@use "sass:color";
+
 :host {
   display: block;
   width: 100%;
@@ -10,137 +12,126 @@
 }
 
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fafafa;
+  
   h2 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 18px;
     font-weight: 500;
-  }
-  
-  .badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    
-    &.system-wide {
-      background-color: #e3f2fd;
-      color: #1976d2;
-    }
   }
 }
 
 .card-content {
   flex: 1;
+  padding: 15px;
   overflow-y: auto;
 }
 
 .eol-devices-list {
-  margin: 0 -1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .eol-device-item {
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  padding: 12px;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  border-left: 3px solid #e0e0e0;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   
   &:hover {
-    background-color: #f9f9f9;
-  }
-}
-
-.device-info {
-  flex: 1;
-  min-width: 0;
-  padding-right: 0.5rem;
-  
-  .device-name {
-    margin: 0 0 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
   
-  .device-model {
-    margin: 0;
-    font-size: 0.75rem;
-    color: #757575;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-.eol-info {
-  text-align: right;
-  white-space: nowrap;
-  
-  .eol-date {
-    font-size: 0.75rem;
-    color: #616161;
-    margin-bottom: 0.25rem;
-  }
-  
-  .eol-countdown {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.125rem 0.5rem;
-    border-radius: 4px;
+  .device-info {
+    flex: 1;
     
-    &.critical {
-      background-color: rgba(244, 67, 54, 0.1);
-      color: #f44336;
+    .device-name {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 4px;
     }
     
-    &.warning {
-      background-color: rgba(255, 152, 0, 0.1);
-      color: #ff9800;
+    .device-model {
+      font-size: 12px;
+      color: #757575;
+    }
+  }
+  
+  .eol-info {
+    text-align: right;
+    
+    .days-remaining {
+      font-weight: 500;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 4px;
+      
+      &.normal {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+      
+      &.warning {
+        background-color: #fff3e0;
+        color: #ef6c00;
+      }
+      
+      &.critical {
+        background-color: #ffebee;
+        color: #c62828;
+      }
     }
     
-    &.normal {
-      background-color: rgba(76, 175, 80, 0.1);
-      color: #4caf50;
+    .eol-date {
+      font-size: 12px;
+      color: #757575;
     }
   }
 }
 
-.empty-state, .loading-state {
+.no-devices {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
-  color: #9e9e9e;
+  padding: 30px 15px;
+  color: #757575;
   text-align: center;
-  
-  .empty-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-  }
+  font-size: 14px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
   
   .loading-spinner {
-    width: 2.5rem;
-    height: 2.5rem;
-    border: 3px solid rgba(0, 0, 0, 0.1);
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    border-top: 3px solid #1976d2;
+    border-top: 4px solid #1976d2;
     animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
+    margin-bottom: 10px;
   }
   
   p {
-    margin: 0;
-    font-size: 0.875rem;
+    font-size: 16px;
+    color: #757575;
   }
 }
 
@@ -150,16 +141,16 @@
 }
 
 .card-footer {
-  margin-top: 1rem;
+  padding: 10px 15px;
+  border-top: 1px solid #e0e0e0;
   text-align: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
   
-  .link-btn {
+  .view-all-link {
     color: #1976d2;
     text-decoration: none;
+    font-size: 14px;
     font-weight: 500;
-    font-size: 0.875rem;
     
     &:hover {
       text-decoration: underline;

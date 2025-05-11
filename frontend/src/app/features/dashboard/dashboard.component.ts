@@ -6,11 +6,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
-import { DeviceService } from '../../core/services/device.service';
+import { DeviceService, DeviceStatusSummary } from '../../core/services/device.service';
 import { BudgetService } from '../../core/services/budget.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { BudgetOverviewComponent } from './widgets/budget-overview/budget-overview.component';
-import { DeviceStatusComponent, DeviceStatusSummary } from './widgets/device-status/device-status.component';
+import { DeviceStatusComponent } from './widgets/device-status/device-status.component';
 import { RecentNotificationsComponent } from './widgets/recent-notifications/recent-notifications.component';
 import { UpcomingEolComponent } from './widgets/upcoming-eol/upcoming-eol.component';
 import { Notification } from './widgets/recent-notifications/recent-notifications.component';
@@ -104,14 +104,8 @@ export class DashboardComponent implements OnInit {
     this.loading.deviceStatus = true;
     this.deviceService.getDeviceStatusSummary().subscribe({
       next: (status) => {
-        // Create compatible DeviceStatusSummary object for the device-status component
-        this.deviceStatus = {
-          online: status.active,
-          offline: status.critical,
-          maintenance: status.needsAttention,
-          unknown: status.endOfLife,
-          total: status.total
-        };
+        // Using the DeviceStatusSummary directly from the service
+        this.deviceStatus = status;
         this.loading.deviceStatus = false;
       },
       error: (err) => {

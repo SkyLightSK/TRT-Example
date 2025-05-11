@@ -1,44 +1,41 @@
-<div class="card eol-widget">
+<div class="eol-widget">
   <div class="card-header">
     <h2>Upcoming End-of-Life Devices</h2>
     <span class="badge system-wide">System-wide</span>
   </div>
   
   <div class="card-content">
-    <div class="eol-devices-list" *ngIf="!loading && upcomingEolDevices.length > 0">
-      <div 
-        class="eol-device-item" 
-        *ngFor="let device of upcomingEolDevices"
-        [routerLink]="['/devices', device.id]">
-        
-        <div class="device-info">
-          <h3 class="device-name">{{ device.name }}</h3>
-          <p class="device-model">{{ device.model }} ({{ device.type }})</p>
-        </div>
-        
-        <div class="eol-info">
-          <div class="eol-date">{{ formatDate(device.eolDate) }}</div>
-          <div 
-            class="eol-countdown" 
-            [ngClass]="getStatusClass(device.daysUntilEol)">
-            {{ getDaysText(device.daysUntilEol) }}
+    <ng-container *ngIf="!loading; else loadingTemplate">
+      <div *ngIf="upcomingEolDevices && upcomingEolDevices.length > 0" class="eol-devices-list">
+        <div *ngFor="let device of upcomingEolDevices" class="eol-device-item">
+          <div class="device-info">
+            <div class="device-name">{{device.name}}</div>
+            <div class="device-model">{{device.model}} ({{device.type}})</div>
+          </div>
+          <div class="eol-info">
+            <div class="days-remaining" [ngClass]="getStatusClass(device.daysUntilEol)">
+              {{getDaysText(device.daysUntilEol)}}
+            </div>
+            <div class="eol-date">{{formatDate(device.eolDate)}}</div>
           </div>
         </div>
       </div>
-    </div>
+      
+      <div *ngIf="!upcomingEolDevices || upcomingEolDevices.length === 0" class="no-devices">
+        <div class="empty-icon">📅</div>
+        <p class="empty-message">No upcoming EOL devices</p>
+      </div>
+    </ng-container>
     
-    <div class="empty-state" *ngIf="!loading && upcomingEolDevices.length === 0">
-      <div class="empty-icon">📅</div>
-      <p class="empty-message">No upcoming EOL devices</p>
-    </div>
-    
-    <div class="loading-state" *ngIf="loading">
-      <div class="loading-spinner"></div>
-      <p>Loading devices...</p>
-    </div>
+    <ng-template #loadingTemplate>
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading EOL devices...</p>
+      </div>
+    </ng-template>
   </div>
   
   <div class="card-footer">
-    <a routerLink="/devices/eol" class="link-btn">View All EOL Devices</a>
+    <a routerLink="/devices/eol" class="view-all-link">View all EOL devices</a>
   </div>
 </div>

@@ -8,10 +8,10 @@
 
   <div class="dashboard-grid">
     <!-- Budget Overview Widget -->
-    <app-budget-overview [budgetStats]="budgetStats"></app-budget-overview>
+    <app-budget-overview [budgetStats]="budgetStats" [loading]="loading.budget"></app-budget-overview>
 
     <!-- Device Status Widget -->
-    <app-device-status [deviceStatus]="deviceStatus"></app-device-status>
+    <app-device-status [deviceStatus]="deviceStatus" [loading]="loading.deviceStatus"></app-device-status>
 
     <!-- Notifications Widget -->
     <app-recent-notifications [notifications]="notifications" [loading]="loading.notifications"></app-recent-notifications>

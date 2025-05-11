@@ -31,6 +31,15 @@
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
+
+  /* Add styles for all widgets in the dashboard grid */
+  > * {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    background-color: white;
+    overflow: hidden;
+  }
 }
 
 .loading-container {
@@ -62,24 +71,7 @@
   100% { transform: rotate(360deg); }
 }
 
-.btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-
-  &.btn-primary {
-    background-color: #1976d2;
-    color: white;
-    
-    &:hover {
-      background-color: #1565c0;
-    }
-  }
-}
-
+/* Single unified button style */
 .btn {
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -106,6 +98,34 @@
     &:hover {
       background-color: #f5f5f5;
     }
+  }
+}
+
+/* Widget section styling */
+:host ::ng-deep {
+  /* Common header styles for all widgets */
+  .card-header {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 15px;
+    background-color: #fafafa;
+    
+    h2 {
+      font-weight: 500;
+      margin: 0;
+      color: #424242;
+    }
+  }
+  
+  /* Common content styles for all widgets */
+  .card-content {
+    padding: 15px;
+  }
+  
+  /* Common footer styles for all widgets */
+  .card-footer {
+    border-top: 1px solid #e0e0e0;
+    padding: 10px 15px;
+    background-color: #fafafa;
   }
 }
 

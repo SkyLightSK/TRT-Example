@@ -12,6 +12,7 @@ import { BudgetStatistics, YearlyBudgetTrend } from '../../../../core/services/b
 })
 export class BudgetOverviewComponent {
   @Input() budgetStats: BudgetStatistics | null = null;
+  @Input() loading = false;
   
   selectedYears: number[] = [];
   availableYears: number[] = [];

@@ -1,56 +1,43 @@
-<div class="card notifications-widget">
+<div class="notifications-widget">
   <div class="card-header">
     <h2>Recent Notifications</h2>
-    <div class="filter-tabs">
-      <button 
-        class="filter-tab" 
-        [class.active]="activeFilter === 'all'"
-        (click)="applyFilter('all')">
-        All
-      </button>
-      <button 
-        class="filter-tab" 
-        [class.active]="activeFilter === 'unread'"
-        (click)="applyFilter('unread')">
-        Unread
-      </button>
+    <div class="notification-filters">
+      <button class="filter-btn" [class.active]="activeFilter === 'all'" (click)="applyFilter('all')">All</button>
+      <button class="filter-btn" [class.active]="activeFilter === 'unread'" (click)="applyFilter('unread')">Unread</button>
     </div>
   </div>
   
   <div class="card-content">
-    <div class="notifications-list" *ngIf="!loading && filteredNotifications.length > 0">
-      <div 
-        class="notification-item" 
-        *ngFor="let notification of filteredNotifications"
-        [class.unread]="!notification.read"
-        [routerLink]="notification.link || '/notifications'">
-        
-        <div class="notification-icon" [ngClass]="getTypeClass(notification.type)">
-          <mat-icon>{{ getTypeIcon(notification.type) }}</mat-icon>
-        </div>
-        
-        <div class="notification-content">
-          <div class="notification-header">
-            <h3 class="notification-title">{{ notification.title }}</h3>
-            <span class="notification-time">{{ getRelativeTime(notification.timestamp) }}</span>
+    <ng-container *ngIf="!loading; else loadingTemplate">
+      <div *ngIf="filteredNotifications && filteredNotifications.length > 0" class="notifications-list">
+        <div *ngFor="let notification of filteredNotifications" class="notification-item" [class.unread]="!notification.read">
+          <div class="notification-icon">
+            <mat-icon [ngClass]="getTypeClass(notification.type)">{{getTypeIcon(notification.type)}}</mat-icon>
           </div>
-          <p class="notification-message">{{ notification.message }}</p>
+          <div class="notification-content">
+            <div class="notification-header">
+              <div class="notification-title">{{notification.title}}</div>
+              <div class="notification-time">{{getRelativeTime(notification.timestamp)}}</div>
+            </div>
+            <div class="notification-message">{{notification.message}}</div>
+          </div>
         </div>
       </div>
-    </div>
+      
+      <div *ngIf="!filteredNotifications || filteredNotifications.length === 0" class="no-notifications">
+        <p>No notifications found</p>
+      </div>
+    </ng-container>
     
-    <div class="empty-state" *ngIf="!loading && filteredNotifications.length === 0">
-      <mat-icon class="empty-icon">notifications_off</mat-icon>
-      <p class="empty-message">No {{ activeFilter === 'unread' ? 'unread ' : '' }}notifications</p>
-    </div>
-    
-    <div class="loading-state" *ngIf="loading">
-      <div class="loading-spinner"></div>
-      <p>Loading notifications...</p>
-    </div>
+    <ng-template #loadingTemplate>
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading notifications...</p>
+      </div>
+    </ng-template>
   </div>
   
   <div class="card-footer">
-    <a routerLink="/notifications" class="link-btn">View All Notifications</a>
+    <a routerLink="/notifications" class="view-all-link">View all notifications</a>
   </div>
 </div>

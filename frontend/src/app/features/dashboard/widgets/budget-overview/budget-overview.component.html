@@ -1,97 +1,86 @@
-<div class="card budget-overview">
+<div class="budget-overview-widget">
   <div class="card-header">
     <h2>Budget Overview</h2>
-    <div class="budget-meta">
-      <span class="badge system-wide">System-wide</span>
-    </div>
   </div>
+  
   <div class="card-content">
-    <div class="metrics">
-      <div class="metric">
-        <div class="metric-value">{{ formatCurrency(budgetStats?.totalAllocated || 0) }}</div>
-        <div class="metric-label">Total Allocated</div>
-      </div>
-      <div class="metric">
-        <div class="metric-value">{{ formatCurrency(budgetStats?.totalSpent || 0) }}</div>
-        <div class="metric-label">Total Spent</div>
-      </div>
-      <div class="metric">
-        <div class="metric-value">{{ budgetStats?.overallUtilization || 0 }}%</div>
-        <div class="metric-label">Overall Utilization</div>
-      </div>
-    </div>
-
-    <div class="yearly-trends">
-      <div class="section-header">
-        <h3>Yearly Budget Trends</h3>
-        <div class="year-filters">
-          <span>Filter years:</span>
-          <div class="checkbox-group">
-            <label *ngFor="let year of availableYears" class="year-checkbox">
-              <input type="checkbox" 
-                     [checked]="selectedYears.includes(year)"
-                     (change)="toggleYearFilter(year)">
-              {{ year }}
-            </label>
+    <ng-container *ngIf="!loading; else loadingTemplate">
+      <div *ngIf="budgetStats" class="budget-stats">
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-value">{{formatCurrency(budgetStats.totalAllocated)}}</div>
+            <div class="stat-label">Total Budget</div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-value">{{formatCurrency(budgetStats.totalSpent)}}</div>
+            <div class="stat-label">Spent To Date</div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-value">{{formatPercentage(budgetStats.overallUtilization)}}</div>
+            <div class="stat-label">Budget Utilization</div>
           </div>
         </div>
-      </div>
-      
-      <div class="chart-container">
-        <div class="bar-chart">
-          <div class="chart-bars">
-            <div class="year-column" *ngFor="let trend of getFilteredTrends()">
-              <div class="bar-container">
-                <div class="budget-bar" [style.height]="getTrendBarHeight(trend)">
-                  <div class="spent-bar" [style.height]="getSpentBarHeight(trend)"></div>
+        
+        <div class="budget-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="budgetStats.overallUtilization"></div>
+          </div>
+          <div class="progress-labels">
+            <span>0%</span>
+            <span>50%</span>
+            <span>100%</span>
+          </div>
+        </div>
+        
+        <div *ngIf="budgetStats.yearlyTrends && budgetStats.yearlyTrends.length" class="yearly-trends">
+          <div class="trends-header">
+            <h3>Yearly Budget Trends</h3>
+            <div class="year-filters">
+              <button 
+                *ngFor="let year of availableYears" 
+                class="year-filter-btn" 
+                [class.active]="selectedYears.includes(year)"
+                (click)="toggleYearFilter(year)">
+                {{year}}
+              </button>
+            </div>
+          </div>
+          
+          <div class="trends-chart">
+            <div class="chart-bars">
+              <div *ngFor="let trend of getFilteredTrends()" class="chart-bar-group">
+                <div class="chart-bar total" [style.height]="getTrendBarHeight(trend)">
+                  <div class="spent-overlay" [style.height]="getSpentBarHeight(trend)"></div>
                 </div>
+                <div class="bar-label">{{trend.year}}</div>
               </div>
-              <div class="year-label">{{ trend.year }}</div>
             </div>
-          </div>
-          <div class="chart-legend">
-            <div class="legend-item">
-              <div class="legend-color total-budget"></div>
-              <div class="legend-label">Total Budget</div>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color spent-budget"></div>
-              <div class="legend-label">Spent Amount</div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-color total"></div>
+                <span>Total Budget</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color spent"></div>
+                <span>Spent to Date</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="trends-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Fiscal Year</th>
-              <th>Total Budget</th>
-              <th>Spent to Date</th>
-              <th>Utilization</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let trend of getFilteredTrends()">
-              <td>{{ trend.year }}</td>
-              <td>{{ formatCurrency(trend.totalBudget) }}</td>
-              <td>{{ formatCurrency(trend.spentToDate) }}</td>
-              <td>
-                <div class="utilization-cell">
-                  <div class="progress-mini">
-                    <div class="progress" [style.width]="trend.utilization + '%'"></div>
-                  </div>
-                  <span>{{ trend.utilization }}%</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    </ng-container>
+    
+    <ng-template #loadingTemplate>
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading budget data...</p>
       </div>
-    </div>
+    </ng-template>
   </div>
+  
   <div class="card-footer">
-    <a routerLink="/budget" class="link-btn">View Budget Details</a>
+    <a routerLink="/budget" class="view-details-link">View budget details</a>
   </div>
 </div>

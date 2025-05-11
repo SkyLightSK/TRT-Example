@@ -15,7 +15,7 @@ export class LayoutComponent implements OnInit {
   userMenuOpen = false;
   currentUser$: Observable<User | null>;
 
-  constructor(private authService: AuthService) {
+  constructor(public authService: AuthService) {
     this.currentUser$ = this.authService.currentUser$;
   }
 

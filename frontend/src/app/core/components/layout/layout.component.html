@@ -5,7 +5,7 @@
       <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
       <a routerLink="/hardware" routerLinkActive="active">Hardware</a>
       <a routerLink="/budget" routerLinkActive="active">Budget</a>
-      <a routerLink="/admin" routerLinkActive="active">Admin</a>
+      <a routerLink="/admin" routerLinkActive="active" *ngIf="authService.hasRole('ADMIN')">Admin</a>
     </div>
     <div class="navbar-right">
       <div class="user-profile" (click)="toggleUserMenu()" [class.active]="userMenuOpen">
@@ -52,6 +52,13 @@
           <h3>Budget</h3>
           <a routerLink="/budget" routerLinkActive="active">Overview</a>
           <a routerLink="/budget/forecasts" routerLinkActive="active">Forecasts</a>
+        </div>
+        <div class="nav-section" *ngIf="authService.hasRole('ADMIN')">
+          <h3>Administration</h3>
+          <a routerLink="/admin" routerLinkActive="active">Dashboard</a>
+          <a routerLink="/admin/users" routerLinkActive="active">Users</a>
+          <a routerLink="/admin/entities" routerLinkActive="active">Entities</a>
+          <a routerLink="/admin/settings" routerLinkActive="active">Settings</a>
         </div>
       </nav>
     </aside>

@@ -46,14 +46,12 @@ import { DeviceFormComponent } from '../device-form/device-form.component';
 })
 export class TerminalsComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
-    'nsn',
-    'type',
-    'manufacturer',
+    'name',
+    'serialNumber',
+    'deviceType',
     'model',
-    'location',
-    'endOfLife',
-    'status',
-    'eligibleUpgrade',
+    'warrantyExpiration',
+    'deviceStatus',
     'actions'
   ];
   dataSource = new MatTableDataSource<Device>([]);
@@ -86,8 +84,7 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
     this.hardwareService.getDevices().subscribe({
       next: (devices) => {
         // Filter only Register type devices
-        const terminals = devices.filter(device => device.type === 'Register');
-        console.log('Loaded terminals:', terminals);
+        const terminals = devices.filter(device => device.deviceType === 'Register');
         this.dataSource.data = terminals;
         this.isLoading = false;
         if (this.table) {
@@ -95,7 +92,6 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
         }
       },
       error: (error) => {
-        console.error('Error loading terminals:', error);
         this.snackBar.open('Error loading terminals', 'Close', { duration: 3000 });
         this.isLoading = false;
       }
@@ -105,7 +101,7 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
   openDeviceForm(device?: Device): void {
     const dialogRef = this.dialog.open(DeviceFormComponent, {
       width: '600px',
-      data: device ? { ...device } : { type: 'Register' } // Pre-select Register type for new terminals
+      data: device ? { ...device } : { deviceType: 'Register' } // Pre-select Register type for new terminals
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -113,7 +109,7 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
         if (device) {
           this.updateDevice(device.id, result);
         } else {
-          this.createDevice({...result, type: 'Register'});
+          this.createDevice({...result, deviceType: 'Register'});
         }
       }
     });
@@ -127,7 +123,6 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
         this.snackBar.open('Terminal created successfully', 'Close', { duration: 3000 });
       },
       error: (error) => {
-        console.error('Error creating terminal:', error);
         this.snackBar.open('Error creating terminal', 'Close', { duration: 3000 });
       }
     });
@@ -145,7 +140,6 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
         this.snackBar.open('Terminal updated successfully', 'Close', { duration: 3000 });
       },
       error: (error) => {
-        console.error('Error updating terminal:', error);
         this.snackBar.open('Error updating terminal', 'Close', { duration: 3000 });
       }
     });
@@ -159,7 +153,6 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
           this.snackBar.open('Terminal deleted successfully', 'Close', { duration: 3000 });
         },
         error: (error) => {
-          console.error('Error deleting terminal:', error);
           this.snackBar.open('Error deleting terminal', 'Close', { duration: 3000 });
         }
       });

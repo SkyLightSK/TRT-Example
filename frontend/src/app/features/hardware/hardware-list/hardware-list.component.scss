@@ -159,77 +159,10 @@
     }
   }
   
-  // Improved filter field styling
+  // Filter field styling (keeping it simple)
   .filter-field {
     width: 100%;
     margin-bottom: 24px;
-    
-    ::ng-deep {
-      .mat-form-field-wrapper {
-        padding-bottom: 0;
-      }
-      
-      .mat-form-field-infix {
-        width: auto;
-        padding: 0.75em 0 0.75em;
-      }
-      
-      .mat-form-field-flex {
-        background-color: #fff;
-        border-radius: 8px;
-        transition: background-color 0.2s;
-        
-        &:hover {
-          background-color: #f8f9fa;
-        }
-      }
-      
-      .mat-form-field-outline {
-        color: #d0d7de;
-      }
-      
-      .mat-form-field-outline-thick {
-        color: #3498db !important;
-      }
-      
-      .mat-form-field-outline-start,
-      .mat-form-field-outline-gap,
-      .mat-form-field-outline-end {
-        border-width: 1px;
-      }
-      
-      .mat-form-field-label-wrapper {
-        top: -0.75em;
-        padding-top: 0.75em;
-      }
-      
-      .mat-form-field-label {
-        color: #6b7c93;
-        font-size: 14px;
-      }
-      
-      .mat-form-field-subscript-wrapper {
-        font-size: 12px;
-        margin-top: 0.5em;
-      }
-      
-      input.mat-input-element {
-        margin-top: 0.2em;
-        padding: 0 0.5em;
-        color: #2c3e50;
-        
-        &::placeholder {
-          color: #a0aec0;
-          font-size: 14px;
-          opacity: 1;
-        }
-      }
-      
-      .mat-form-field-suffix {
-        color: #6b7c93;
-        margin-right: 0.5em;
-      }
-    }
   }
   
   .table-container {
@@ -312,16 +245,15 @@
       color: #4CAF50;
     }
     
-    .eol-warning {
-      color: #FF5722;
+    .warranty-warning {
+      color: #f39c12;
       font-weight: 500;
       position: relative;
       
       &::after {
-        content: "⚠️";
-        position: relative;
+        content: '⚠️';
         margin-left: 4px;
-        font-size: 12px;
+        font-size: 14px;
       }
     }
     
@@ -367,102 +299,9 @@
   }
 }
 
-// Global styles for form fields
+// Remove conflicting global form field overrides
+// Only keep styles for status indicators and common components
 ::ng-deep {
-  // Global form field improvements
-  .mat-form-field-appearance-outline {
-    .mat-form-field-outline {
-      color: #d0d7de;
-    }
-    
-    .mat-form-field-outline-thick {
-      color: #3498db;
-    }
-    
-    .mat-form-field-infix {
-      padding: 0.75em 0 0.75em;
-    }
-    
-    .mat-select-value {
-      color: #2c3e50;
-    }
-    
-    .mat-select-placeholder,
-    .mat-form-field-label {
-      color: #6b7c93;
-    }
-    
-    .mat-form-field-label {
-      top: 1.65em;
-    }
-    
-    &.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
-      transform: translateY(-1.2em) scale(0.75);
-    }
-    
-    .mat-form-field-outline-start,
-    .mat-form-field-outline-gap,
-    .mat-form-field-outline-end {
-      border-width: 1px;
-    }
-    
-    &.mat-focused {
-      .mat-form-field-outline-thick {
-        color: #3498db;
-      }
-      
-      .mat-form-field-label {
-        color: #3498db;
-      }
-    }
-    
-    &.mat-form-field-invalid {
-      .mat-form-field-outline-thick {
-        color: #f44336;
-      }
-      
-      .mat-form-field-label {
-        color: #f44336;
-      }
-    }
-  }
-  
-  // Placeholder styling
-  input::placeholder {
-    color: #a0aec0 !important;
-    font-size: 14px !important;
-    opacity: 1 !important;
-  }
-  
-  // Tooltip fixes
-  .mat-tooltip {
-    background-color: rgba(33, 33, 33, 0.9) !important;
-    font-size: 14px !important;
-    padding: 8px 12px !important;
-    border-radius: 4px !important;
-    max-width: 250px !important;
-    word-break: break-word;
-  }
-  
-  // Snackbars styling
-  .success-snackbar {
-    background-color: #4CAF50;
-    color: white;
-    
-    .mat-simple-snackbar-action {
-      color: white;
-    }
-  }
-  
-  .error-snackbar {
-    background-color: #F44336;
-    color: white;
-    
-    .mat-simple-snackbar-action {
-      color: white;
-    }
-  }
-  
   // Status style in selects and forms
   .active {
     color: #4CAF50;

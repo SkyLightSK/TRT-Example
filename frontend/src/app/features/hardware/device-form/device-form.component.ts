@@ -47,9 +47,6 @@ export class DeviceFormComponent implements OnInit {
   constructor(private fb: FormBuilder) {
     this.isEditMode = !!this.data;
     this.minDate.setDate(this.minDate.getDate()); // Allow today's date
-    
-    // Log incoming data for debugging
-    console.log('Device form initialized with data:', this.data);
   }
 
   ngOnInit(): void {
@@ -58,32 +55,26 @@ export class DeviceFormComponent implements OnInit {
 
   private initForm(): void {
     // Format the date properly if it exists
-    let endOfLifeDate = this.data?.endOfLife;
+    let warrantyExpiration = this.data?.warrantyExpiration;
     
     // Convert string date to Date object if needed
-    if (endOfLifeDate && typeof endOfLifeDate === 'string') {
-      endOfLifeDate = new Date(endOfLifeDate);
+    if (warrantyExpiration && typeof warrantyExpiration === 'string') {
+      warrantyExpiration = new Date(warrantyExpiration);
     }
-    
-    console.log('Initializing form with endOfLife:', endOfLifeDate);
 
     this.deviceForm = this.fb.group({
-      nsn: [this.data?.nsn || '', [Validators.required, Validators.pattern('^[0-9]{13}$')]],
-      type: [this.data?.type || 'Kiosk', Validators.required],
-      manufacturer: [this.data?.manufacturer || '', Validators.required],
+      name: [this.data?.name || '', Validators.required],
+      serialNumber: [this.data?.serialNumber || '', [Validators.required, Validators.pattern('^[0-9]{13}$')]],
+      deviceType: [this.data?.deviceType || 'Kiosk', Validators.required],
       model: [this.data?.model || '', Validators.required],
-      location: [this.data?.location || '', Validators.required],
-      endOfLife: [endOfLifeDate || this.getDefaultEndOfLife(), Validators.required],
-      status: [this.data?.status || 'Active', Validators.required],
-      eligibleUpgrade: [this.data?.eligibleUpgrade === 'Yes' || false],
-      entityId: [this.data?.entityId || 1]
+      purchaseDate: [this.data?.purchaseDate || new Date(), Validators.required],
+      warrantyExpiration: [warrantyExpiration || this.getDefaultWarrantyExpiration(), Validators.required],
+      deviceStatus: [this.data?.deviceStatus || 'Active', Validators.required],
+      entityId: [this.data?.entity?.id || 1]
     });
-    
-    // Log the initial form values
-    console.log('Form initialized with values:', this.deviceForm.value);
   }
 
-  private getDefaultEndOfLife(): Date {
+  private getDefaultWarrantyExpiration(): Date {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 3); // Default 3 years from now
     return date;
@@ -104,30 +95,34 @@ export class DeviceFormComponent implements OnInit {
       try {
         const formValue = { ...this.deviceForm.value };
         
-        // Ensure endOfLife is a Date object
-        if (formValue.endOfLife) {
-          if (typeof formValue.endOfLife === 'string') {
-            formValue.endOfLife = new Date(formValue.endOfLife);
+        // Ensure dates are Date objects
+        if (formValue.warrantyExpiration) {
+          if (typeof formValue.warrantyExpiration === 'string') {
+            formValue.warrantyExpiration = new Date(formValue.warrantyExpiration);
           }
           
           // Make sure the date is valid
-          if (isNaN(formValue.endOfLife.getTime())) {
-            console.error('Invalid date value:', formValue.endOfLife);
-            formValue.endOfLife = this.getDefaultEndOfLife();
+          if (isNaN(formValue.warrantyExpiration.getTime())) {
+            formValue.warrantyExpiration = this.getDefaultWarrantyExpiration();
           }
         } else {
-          formValue.endOfLife = this.getDefaultEndOfLife();
+          formValue.warrantyExpiration = this.getDefaultWarrantyExpiration();
         }
         
-        // Transform eligibleUpgrade from boolean to string format expected by the API
-        formValue.eligibleUpgrade = formValue.eligibleUpgrade ? 'Yes' : 'No';
+        if (formValue.purchaseDate) {
+          if (typeof formValue.purchaseDate === 'string') {
+            formValue.purchaseDate = new Date(formValue.purchaseDate);
+          }
+          
+          if (isNaN(formValue.purchaseDate.getTime())) {
+            formValue.purchaseDate = new Date();
+          }
+        }
         
         // Ensure there's a valid entityId
         if (!formValue.entityId) {
           formValue.entityId = 1;
         }
-        
-        console.log('Submitting form with values:', formValue);
         
         // Use NgZone to ensure the dialog closes properly
         this.ngZone.run(() => {
@@ -135,18 +130,11 @@ export class DeviceFormComponent implements OnInit {
         });
       } catch (error) {
         this.isSubmitting = false;
-        console.error('Error preparing form data:', error);
       }
     } else {
-      console.warn('Form is invalid:', this.deviceForm.errors);
-      
       // Mark all fields as touched to show validation errors
       Object.keys(this.deviceForm.controls).forEach(key => {
-        const control = this.deviceForm.get(key);
-        control?.markAsTouched();
-        if (control?.invalid) {
-          console.warn(`Field ${key} is invalid:`, control.errors);
-        }
+        this.deviceForm.get(key)?.markAsTouched();
       });
     }
   }

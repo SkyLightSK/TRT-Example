@@ -10,29 +10,29 @@
       
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>NSN</mat-label>
-          <input matInput formControlName="nsn">
-          <mat-hint>13-digit National Stock Number</mat-hint>
-          <mat-error *ngIf="deviceForm.get('nsn')?.hasError('required')">NSN is required</mat-error>
-          <mat-error *ngIf="deviceForm.get('nsn')?.hasError('pattern')">NSN must be 13 digits</mat-error>
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name">
+          <mat-error *ngIf="deviceForm.get('name')?.hasError('required')">Name is required</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Type</mat-label>
-          <mat-select formControlName="type">
-            <mat-option *ngFor="let type of deviceTypes" [value]="type">
-              {{type}}
-            </mat-option>
-          </mat-select>
-          <mat-hint>Select device type</mat-hint>
+          <mat-label>Serial Number</mat-label>
+          <input matInput formControlName="serialNumber">
+          <mat-hint>13-digit Serial Number</mat-hint>
+          <mat-error *ngIf="deviceForm.get('serialNumber')?.hasError('required')">Serial Number is required</mat-error>
+          <mat-error *ngIf="deviceForm.get('serialNumber')?.hasError('pattern')">Serial Number must be 13 digits</mat-error>
         </mat-form-field>
       </div>
 
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Manufacturer</mat-label>
-          <input matInput formControlName="manufacturer">
-          <mat-error *ngIf="deviceForm.get('manufacturer')?.hasError('required')">Manufacturer is required</mat-error>
+          <mat-label>Device Type</mat-label>
+          <mat-select formControlName="deviceType">
+            <mat-option *ngFor="let type of deviceTypes" [value]="type">
+              {{type}}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Select device type</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field">
@@ -46,40 +46,33 @@
       
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Location</mat-label>
-          <input matInput formControlName="location">
-          <mat-hint>Physical location of the device</mat-hint>
-          <mat-error *ngIf="deviceForm.get('location')?.hasError('required')">Location is required</mat-error>
+          <mat-label>Purchase Date</mat-label>
+          <input matInput [matDatepicker]="purchasePicker" formControlName="purchaseDate">
+          <mat-hint>When the device was purchased</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="purchasePicker"></mat-datepicker-toggle>
+          <mat-datepicker #purchasePicker></mat-datepicker>
+          <mat-error *ngIf="deviceForm.get('purchaseDate')?.hasError('required')">Purchase date is required</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>End of Life</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="endOfLife" [min]="minDate">
-          <mat-hint>Expected end of life date</mat-hint>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="deviceForm.get('endOfLife')?.hasError('required')">End of Life date is required</mat-error>
+          <mat-label>Warranty Expiration</mat-label>
+          <input matInput [matDatepicker]="warrantyPicker" formControlName="warrantyExpiration" [min]="minDate">
+          <mat-hint>When the warranty expires</mat-hint>
+          <mat-datepicker-toggle matSuffix [for]="warrantyPicker"></mat-datepicker-toggle>
+          <mat-datepicker #warrantyPicker></mat-datepicker>
+          <mat-error *ngIf="deviceForm.get('warrantyExpiration')?.hasError('required')">Warranty expiration date is required</mat-error>
         </mat-form-field>
       </div>
 
       <div class="form-row">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Status</mat-label>
-          <mat-select formControlName="status">
+          <mat-label>Device Status</mat-label>
+          <mat-select formControlName="deviceStatus">
             <mat-option *ngFor="let status of statusOptions" [value]="status">
               <span [class]="status.toLowerCase()">{{status}}</span>
             </mat-option>
           </mat-select>
           <mat-hint>Current operational status</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Eligible for Upgrade</mat-label>
-          <mat-select formControlName="eligibleUpgrade">
-            <mat-option [value]="true">Yes</mat-option>
-            <mat-option [value]="false">No</mat-option>
-          </mat-select>
-          <mat-hint>Whether this device can be upgraded</mat-hint>
         </mat-form-field>
       </div>
     </div>

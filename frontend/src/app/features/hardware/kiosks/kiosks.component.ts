@@ -46,14 +46,12 @@ import { DeviceFormComponent } from '../device-form/device-form.component';
 })
 export class KiosksComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
-    'nsn',
-    'type',
-    'manufacturer',
+    'name',
+    'serialNumber',
+    'deviceType',
     'model',
-    'location',
-    'endOfLife',
-    'status',
-    'eligibleUpgrade',
+    'warrantyExpiration',
+    'deviceStatus',
     'actions'
   ];
   dataSource = new MatTableDataSource<Device>([]);
@@ -86,8 +84,7 @@ export class KiosksComponent implements OnInit, AfterViewInit {
     this.hardwareService.getDevices().subscribe({
       next: (devices) => {
         // Filter only Kiosk type devices
-        const kiosks = devices.filter(device => device.type === 'Kiosk');
-        console.log('Loaded kiosks:', kiosks);
+        const kiosks = devices.filter(device => device.deviceType === 'Kiosk');
         this.dataSource.data = kiosks;
         this.isLoading = false;
         if (this.table) {
@@ -95,7 +92,6 @@ export class KiosksComponent implements OnInit, AfterViewInit {
         }
       },
       error: (error) => {
-        console.error('Error loading kiosks:', error);
         this.snackBar.open('Error loading kiosks', 'Close', { duration: 3000 });
         this.isLoading = false;
       }
@@ -105,7 +101,7 @@ export class KiosksComponent implements OnInit, AfterViewInit {
   openDeviceForm(device?: Device): void {
     const dialogRef = this.dialog.open(DeviceFormComponent, {
       width: '600px',
-      data: device ? { ...device } : { type: 'Kiosk' } // Pre-select Kiosk type for new kiosks
+      data: device ? { ...device } : { deviceType: 'Kiosk' } // Pre-select Kiosk type for new kiosks
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -113,7 +109,7 @@ export class KiosksComponent implements OnInit, AfterViewInit {
         if (device) {
           this.updateDevice(device.id, result);
         } else {
-          this.createDevice({...result, type: 'Kiosk'});
+          this.createDevice({...result, deviceType: 'Kiosk'});
         }
       }
     });
@@ -127,7 +123,6 @@ export class KiosksComponent implements OnInit, AfterViewInit {
         this.snackBar.open('Kiosk created successfully', 'Close', { duration: 3000 });
       },
       error: (error) => {
-        console.error('Error creating kiosk:', error);
         this.snackBar.open('Error creating kiosk', 'Close', { duration: 3000 });
       }
     });
@@ -145,7 +140,6 @@ export class KiosksComponent implements OnInit, AfterViewInit {
         this.snackBar.open('Kiosk updated successfully', 'Close', { duration: 3000 });
       },
       error: (error) => {
-        console.error('Error updating kiosk:', error);
         this.snackBar.open('Error updating kiosk', 'Close', { duration: 3000 });
       }
     });
@@ -159,7 +153,6 @@ export class KiosksComponent implements OnInit, AfterViewInit {
           this.snackBar.open('Kiosk deleted successfully', 'Close', { duration: 3000 });
         },
         error: (error) => {
-          console.error('Error deleting kiosk:', error);
           this.snackBar.open('Error deleting kiosk', 'Close', { duration: 3000 });
         }
       });

@@ -48,22 +48,20 @@ import { finalize } from 'rxjs/operators';
 })
 export class HardwareListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
-    'nsn',
-    'type',
-    'manufacturer',
+    'name',
+    'serialNumber',
+    'deviceType',
     'model',
-    'location',
-    'endOfLife',
-    'status',
-    'eligibleUpgrade',
+    'warrantyExpiration',
+    'deviceStatus',
     'actions'
   ];
   dataSource = new MatTableDataSource<Device>([]);
   isLoading = false;
   filterValue = '';
 
-  // EOL warning threshold in days
-  private eolWarningThreshold = 90; 
+  // Warranty warning threshold in days
+  private warrantyWarningThreshold = 90; 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -98,12 +96,11 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
         const filterValue = filter.toLowerCase().trim();
         
         return !!(
-          (data.nsn && data.nsn.toLowerCase().includes(filterValue)) || 
-          (data.type && data.type.toLowerCase().includes(filterValue)) || 
-          (data.manufacturer && data.manufacturer.toLowerCase().includes(filterValue)) || 
+          (data.name && data.name.toLowerCase().includes(filterValue)) || 
+          (data.serialNumber && data.serialNumber.toLowerCase().includes(filterValue)) || 
+          (data.deviceType && data.deviceType.toLowerCase().includes(filterValue)) || 
           (data.model && data.model.toLowerCase().includes(filterValue)) || 
-          (data.location && data.location.toLowerCase().includes(filterValue)) || 
-          (data.status && data.status.toLowerCase().includes(filterValue))
+          (data.deviceStatus && data.deviceStatus.toLowerCase().includes(filterValue))
         );
       };
     }
@@ -115,7 +112,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (devices) => {
-          console.log('Received devices:', devices);
           this.dataSource.data = devices || [];
           if (this.table) {
             this.table.renderRows();
@@ -125,7 +121,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
           this.setupDataSource();
         },
         error: (error) => {
-          console.error('Error loading devices:', error);
           this.snackBar.open('Error loading devices: ' + error.message, 'Close', { 
             duration: 5000,
             panelClass: 'error-snackbar'
@@ -150,7 +145,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Form result:', result);
         if (device) {
           this.updateDevice(device.id, result);
         } else {
@@ -166,7 +160,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (newDevice) => {
-          console.log('Created device:', newDevice);
           const currentData = this.dataSource.data || [];
           this.dataSource.data = [...currentData, newDevice];
           
@@ -181,7 +174,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
           });
         },
         error: (error) => {
-          console.error('Error creating device:', error);
           this.snackBar.open('Error creating device: ' + error.message, 'Close', { 
             duration: 5000,
             panelClass: 'error-snackbar'
@@ -196,7 +188,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (updatedDevice) => {
-          console.log('Updated device:', updatedDevice);
           const currentData = this.dataSource.data || [];
           const index = currentData.findIndex(d => d.id === id);
           if (index !== -1) {
@@ -215,7 +206,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
           });
         },
         error: (error) => {
-          console.error('Error updating device:', error);
           this.snackBar.open('Error updating device: ' + error.message, 'Close', { 
             duration: 5000,
             panelClass: 'error-snackbar'
@@ -252,7 +242,6 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
               });
             },
             error: (error) => {
-              console.error('Error deleting device:', error);
               this.snackBar.open('Error deleting device: ' + error.message, 'Close', { 
                 duration: 5000,
                 panelClass: 'error-snackbar'
@@ -265,46 +254,41 @@ export class HardwareListComponent implements OnInit, AfterViewInit {
 
   applyFilter(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
-    this.filterValue = inputElement.value.trim().toLowerCase();
-    this.dataSource.filter = this.filterValue;
+    this.filterValue = inputElement.value;
+    this.dataSource.filter = this.filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
   }
 
-  isEolApproaching(device: Device): boolean {
-    if (!device || !device.endOfLife) {
-      return false;
-    }
+  isWarrantyExpiring(device: Device): boolean {
+    if (!device.warrantyExpiration) return false;
     
-    const endOfLifeDate = new Date(device.endOfLife);
+    const warrantyDate = new Date(device.warrantyExpiration);
+    if (isNaN(warrantyDate.getTime())) return false;
+    
     const today = new Date();
-    const daysUntilEol = Math.floor((endOfLifeDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    const dayDiff = Math.floor((warrantyDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
-    return daysUntilEol <= this.eolWarningThreshold && daysUntilEol > 0;
+    return dayDiff >= 0 && dayDiff <= this.warrantyWarningThreshold;
   }
 }
 
-// Delete confirmation dialog component
 @Component({
   selector: 'app-device-delete-confirm',
   template: `
     <h2 mat-dialog-title>Confirm Delete</h2>
-    <mat-dialog-content>
-      Are you sure you want to delete this device? This action cannot be undone.
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button [mat-dialog-close]="false">Cancel</button>
+    <div mat-dialog-content>
+      <p>Are you sure you want to delete this device? This action cannot be undone.</p>
+    </div>
+    <div mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancel</button>
       <button mat-raised-button color="warn" [mat-dialog-close]="true">Delete</button>
-    </mat-dialog-actions>
+    </div>
   `,
   standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatButtonModule
-  ]
+  imports: [MatDialogModule, MatButtonModule]
 })
 export class DeviceDeleteConfirmComponent {
   constructor() {}

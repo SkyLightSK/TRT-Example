@@ -63,8 +63,21 @@ body {
   }
 }
 
-/* Global Form Field Styling */
+/* -------------------- */
+/* MATERIAL FORM FIELDS FIXES */
+/* -------------------- */
+
+// Basic styles for Material form fields
 .mat-form-field-appearance-outline {
+  .mat-form-field-wrapper {
+    padding-bottom: 0;
+  }
+  
+  .mat-form-field-flex {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
   .mat-form-field-outline {
     color: #d0d7de;
   }
@@ -73,18 +86,12 @@ body {
     color: #3498db;
   }
   
-  .mat-form-field-infix {
-    padding: 0.75em 0 0.75em;
-  }
-  
-  input.mat-input-element {
-    margin-top: 0.2em;
-  }
-  
+  // Colors and basic appearance
   .mat-form-field-label {
     color: #6b7c93;
   }
   
+  // Focused state
   &.mat-focused {
     .mat-form-field-outline-thick {
       color: #3498db;
@@ -95,10 +102,12 @@ body {
     }
   }
   
+  // Required marker color
   .mat-form-field-required-marker {
     color: #e53e3e;
   }
   
+  // Invalid state
   &.mat-form-field-invalid {
     .mat-form-field-outline-thick {
       color: #f44336;
@@ -110,21 +119,13 @@ body {
   }
 }
 
-/* Input Placeholder Styling */
-::placeholder {
+/* Input Placeholder Styling - ensuring visible but subtle placeholders */
+input::placeholder,
+textarea::placeholder,
+.mat-select-placeholder {
   color: #a0aec0 !important;
   font-size: 14px !important;
   opacity: 1 !important;
-}
-
-:-ms-input-placeholder {
-  color: #a0aec0 !important;
-  font-size: 14px !important;
-}
-
-::-ms-input-placeholder {
-  color: #a0aec0 !important;
-  font-size: 14px !important;
 }
 
 /* Button Styling */

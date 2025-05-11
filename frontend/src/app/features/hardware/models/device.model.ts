@@ -1,38 +1,35 @@
 export interface Device {
   id: number;
-  nsn: string;
-  type: 'Kiosk' | 'Register' | 'DMB' | 'Enclosure';
-  manufacturer: string;
+  name: string;
+  serialNumber: string;
   model: string;
-  location: string;
-  endOfLife: Date;
-  status: 'Active' | 'Required' | 'Retired';
-  eligibleUpgrade?: string;
-  entityId: number;
+  deviceType: 'Kiosk' | 'Register' | 'DMB' | 'Enclosure';
+  deviceStatus: 'Active' | 'Required' | 'Retired';
+  purchaseDate?: Date;
+  warrantyExpiration?: Date;
+  entity?: any;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateDeviceDto {
-  nsn: string;
-  type: 'Kiosk' | 'Register' | 'DMB' | 'Enclosure';
-  manufacturer: string;
+  name: string;
+  serialNumber: string;
   model: string;
-  location: string;
-  endOfLife: Date;
-  status: 'Active' | 'Required' | 'Retired';
-  eligibleUpgrade?: string;
-  entityId: number;
+  deviceType: 'Kiosk' | 'Register' | 'DMB' | 'Enclosure';
+  deviceStatus: 'Active' | 'Required' | 'Retired';
+  purchaseDate?: Date;
+  warrantyExpiration?: Date;
+  entityId?: number;
 }
 
 export interface UpdateDeviceDto {
-  nsn?: string;
-  type?: 'Kiosk' | 'Register' | 'DMB' | 'Enclosure';
-  manufacturer?: string;
+  name?: string;
+  serialNumber?: string;
   model?: string;
-  location?: string;
-  endOfLife?: Date;
-  status?: 'Active' | 'Required' | 'Retired';
-  eligibleUpgrade?: string;
+  deviceType?: 'Kiosk' | 'Register' | 'DMB' | 'Enclosure';
+  deviceStatus?: 'Active' | 'Required' | 'Retired';
+  purchaseDate?: Date;
+  warrantyExpiration?: Date;
   entityId?: number;
 } 

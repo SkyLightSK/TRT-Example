@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsDate, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsDate, IsNumber, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { DeviceType, DeviceStatus } from '../entities/device.entity';
 
 export class CreateDeviceDto {
   @ApiProperty({
@@ -26,6 +27,22 @@ export class CreateDeviceDto {
   @IsNotEmpty()
   @IsString()
   model: string;
+
+  @ApiProperty({
+    description: 'Device type',
+    enum: DeviceType,
+    example: DeviceType.Kiosk,
+  })
+  @IsEnum(DeviceType)
+  deviceType: DeviceType;
+
+  @ApiProperty({
+    description: 'Device status',
+    enum: DeviceStatus,
+    example: DeviceStatus.Active,
+  })
+  @IsEnum(DeviceStatus)
+  deviceStatus: DeviceStatus;
 
   @ApiPropertyOptional({
     description: 'Purchase date',

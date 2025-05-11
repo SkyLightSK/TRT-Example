@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDate, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsDate, IsNumber, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { DeviceType, DeviceStatus } from '../entities/device.entity';
 
 export class UpdateDeviceDto {
   @ApiPropertyOptional({
@@ -26,6 +27,24 @@ export class UpdateDeviceDto {
   @IsOptional()
   @IsString()
   model?: string;
+
+  @ApiPropertyOptional({
+    description: 'Device type',
+    enum: DeviceType,
+    example: DeviceType.Kiosk,
+  })
+  @IsOptional()
+  @IsEnum(DeviceType)
+  deviceType?: DeviceType;
+
+  @ApiPropertyOptional({
+    description: 'Device status',
+    enum: DeviceStatus,
+    example: DeviceStatus.Active,
+  })
+  @IsOptional()
+  @IsEnum(DeviceStatus)
+  deviceStatus?: DeviceStatus;
 
   @ApiPropertyOptional({
     description: 'Purchase date',

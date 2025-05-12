@@ -6,9 +6,10 @@ import {
   HttpErrorResponse
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, switchMap, take, finalize } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 // Function-based interceptor for Angular standalone applications
 export const tokenInterceptor: HttpInterceptorFn = (
@@ -16,71 +17,50 @@ export const tokenInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
+  const router = inject(Router);
   
   // Skip token for auth endpoints like login
-  if (request.url.includes('/auth/login') || request.url.includes('/auth/refresh')) {
+  if (request.url.includes('/auth/login')) {
     return next(request);
   }
 
   // Add auth token to the request
   const token = authService.getToken();
   if (token) {
+    console.log('Adding token to request:', request.url);
     request = addToken(request, token);
+  } else {
+    console.log('No token available for request:', request.url);
   }
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        return handle401Error(request, next, authService);
+        // If unauthorized, redirect to login
+        console.log('Unauthorized request, redirecting to login');
+        authService.logout();
+        router.navigate(['/login']);
       }
       return throwError(() => error);
     })
   );
 }
 
-// Static variable to track refreshing state
-let isRefreshing = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
-
 function addToken(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
-  return request.clone({
+  // Make sure token doesn't have extra quotes
+  let cleanToken = token;
+  if (token.startsWith('"') && token.endsWith('"')) {
+    cleanToken = token.substring(1, token.length - 1);
+    console.log('Cleaned token from quotes:', cleanToken);
+  }
+  
+  const clonedRequest = request.clone({
     setHeaders: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${cleanToken}`
     }
   });
-}
-
-function handle401Error(
-  request: HttpRequest<unknown>,
-  next: HttpHandlerFn,
-  authService: AuthService
-): Observable<HttpEvent<unknown>> {
-  if (!isRefreshing) {
-    isRefreshing = true;
-    refreshTokenSubject.next(null);
-
-    return authService.refreshToken().pipe(
-      switchMap((token: string) => {
-        refreshTokenSubject.next(token);
-        return next(addToken(request, token));
-      }),
-      catchError((error) => {
-        // If refresh token fails, logout the user
-        authService.logout();
-        return throwError(() => error);
-      }),
-      finalize(() => {
-        isRefreshing = false;
-      })
-    );
-  } else {
-    // Wait for the token to be refreshed
-    return refreshTokenSubject.pipe(
-      filter(token => token != null),
-      take(1),
-      switchMap(token => {
-        return next(addToken(request, token!));
-      })
-    );
-  }
+  
+  console.log('Request headers:', clonedRequest.headers.keys().map(key => `${key}: ${clonedRequest.headers.get(key)}`));
+  
+  return clonedRequest;
 } 

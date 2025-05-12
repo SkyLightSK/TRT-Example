@@ -80,17 +80,12 @@ export class AuthService {
   }
 
   refreshToken(): Observable<string> {
-    return this.apiService.refreshToken()
-      .pipe(
-        map(response => {
-          localStorage.setItem('token', response.access_token);
-          return response.access_token;
-        }),
-        catchError(error => {
-          this.logout();
-          return throwError(() => new Error('Session expired. Please login again.'));
-        })
-      );
+    // For now, just return the current token as the refresh endpoint is not implemented
+    const token = this.getToken();
+    if (token) {
+      return of(token);
+    }
+    return throwError(() => new Error('No token available'));
   }
 
   getProfile(): Observable<User> {
@@ -119,7 +114,15 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    
+    // Remove quotes if they exist
+    if (token.startsWith('"') && token.endsWith('"')) {
+      return token.substring(1, token.length - 1);
+    }
+    
+    return token;
   }
 
   getCurrentUser(): User | null {
@@ -144,11 +147,24 @@ export class AuthService {
   private handleAuthentication(authData: AuthResponse): void {
     const { access_token, user } = authData;
     
-    // Store auth data in local storage
-    localStorage.setItem('token', access_token);
+    // Store auth data in local storage - ensure token doesn't have quotes
+    const cleanToken = typeof access_token === 'string' ? access_token : JSON.stringify(access_token);
+    localStorage.setItem('token', cleanToken);
     localStorage.setItem('user', JSON.stringify(user));
+    
+    console.log('Token stored:', cleanToken);
     
     // Update current user
     this.currentUserSubject.next(user);
+  }
+
+  checkToken(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}${environment.authApiPath}/check`)
+      .pipe(
+        catchError(error => {
+          console.error('Token check failed:', error);
+          return throwError(() => error);
+        })
+      );
   }
 } 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -23,7 +23,8 @@ export class ApiService {
   }
 
   refreshToken(): Observable<any> {
-    return this.http.post(`${this.authUrl}/refresh`, {});
+    // This endpoint is not implemented yet, so we'll return a mock response
+    return of({ access_token: this.getToken() });
   }
 
   logout(): Observable<any> {
@@ -32,6 +33,10 @@ export class ApiService {
 
   getProfile(): Observable<any> {
     return this.http.get(`${this.authUrl}/me`);
+  }
+
+  getToken(): string {
+    return localStorage.getItem('token') || '';
   }
 
   // Entity endpoints
@@ -120,5 +125,16 @@ export class ApiService {
   
   getBudgetItem(id: number): Observable<any> {
     return this.http.get(`${this.budgetsUrl}/items/${id}`);
+  }
+
+  // Test endpoints
+  testDevicesAccess(): Observable<any> {
+    console.log('Testing device access with token:', this.getToken());
+    return this.http.get(`${this.devicesUrl}`);
+  }
+
+  testAuth(): Observable<any> {
+    console.log('Testing auth with token:', this.getToken());
+    return this.http.get(`${this.devicesUrl}/test`);
   }
 } 

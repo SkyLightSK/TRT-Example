@@ -34,6 +34,16 @@ export class BudgetsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('statistics')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get compiled budget statistics' })
+  @ApiQuery({ name: 'entityId', required: false, description: 'Filter by entity ID' })
+  @ApiResponse({ status: 200, description: 'Return compiled budget statistics' })
+  getBudgetStatistics(@Query('entityId') entityId?: string) {
+    return this.budgetsService.getBudgetStatistics(entityId ? +entityId : undefined);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('items')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all budget items' })

@@ -10,11 +10,44 @@
   padding: 15px;
   border-bottom: 1px solid #e0e0e0;
   background-color: #fafafa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   
   h2 {
     margin: 0;
     font-size: 18px;
     font-weight: 500;
+  }
+  
+  .refresh-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #757575;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+      color: #1976d2;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    mat-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+      line-height: 20px;
+    }
   }
 }
 
@@ -169,6 +202,7 @@
   flex-direction: column;
   align-items: center;
   width: 40px;
+  position: relative;
   
   .chart-bar {
     width: 30px;
@@ -194,6 +228,39 @@
     font-size: 12px;
     color: #616161;
     margin-top: 5px;
+  }
+  
+  .bar-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 10;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    
+    &:after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+  }
+  
+  &:hover .bar-tooltip {
+    opacity: 1;
   }
 }
 
@@ -268,7 +335,250 @@
   }
 }
 
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  height: 300px;
+  
+  .error-icon {
+    font-size: 40px;
+    color: #f44336;
+    margin-bottom: 10px;
+    
+    mat-icon {
+      font-size: 40px;
+      height: 40px;
+      width: 40px;
+    }
+  }
+  
+  p {
+    font-size: 16px;
+    color: #757575;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .retry-btn {
+    padding: 8px 16px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: #1565c0;
+    }
+  }
+}
+
+.no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  color: #757575;
+  font-size: 14px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  border: 1px dashed #e0e0e0;
+  margin: 20px 0;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.entity-breakdown {
+  margin-bottom: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+  
+  h3 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .entity-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+  
+  .entity-item {
+    margin-bottom: 12px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .entity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      
+      .entity-name {
+        font-size: 13px;
+        font-weight: 500;
+      }
+      
+      .entity-budget {
+        font-size: 13px;
+        color: #616161;
+      }
+    }
+    
+    .entity-progress {
+      .progress-bar {
+        height: 6px;
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 3px;
+        
+        .progress-fill {
+          height: 100%;
+          background-color: #2196f3;
+          transition: width 0.3s ease;
+        }
+      }
+      
+      .entity-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #757575;
+      }
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  height: 100%;
+  min-height: 300px;
+  
+  .empty-icon {
+    font-size: 48px;
+    color: #bdbdbd;
+    margin-bottom: 16px;
+    
+    mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+    }
+  }
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+    color: #616161;
+  }
+  
+  p {
+    font-size: 14px;
+    color: #757575;
+    margin: 0 0 24px 0;
+  }
+  
+  .create-budget-btn {
+    padding: 8px 16px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: #1565c0;
+    }
+  }
+}
+
+.calculation-info {
+  margin: 15px 0;
+  border-top: 1px dashed #e0e0e0;
+  padding-top: 15px;
+  
+  .info-toggle {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    color: #1976d2;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    
+    mat-icon {
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+      margin-right: 5px;
+    }
+    
+    &:hover {
+      color: #1565c0;
+      text-decoration: underline;
+    }
+  }
+  
+  .calculation-details {
+    margin-top: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    padding: 12px 15px;
+    font-size: 13px;
+    
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #424242;
+    }
+    
+    ul {
+      margin: 0 0 10px 0;
+      padding-left: 20px;
+      
+      li {
+        margin-bottom: 5px;
+        line-height: 1.4;
+        color: #616161;
+        
+        strong {
+          color: #424242;
+        }
+      }
+    }
+    
+    .calculation-note {
+      margin: 0;
+      font-style: italic;
+      color: #757575;
+      font-size: 12px;
+    }
+  }
 }

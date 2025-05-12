@@ -140,6 +140,17 @@ export class ApiService {
     return this.get(`/budgets/${id}`);
   }
 
+  getBudgetStatistics(entityId?: number): Observable<any> {
+    let url = `${this.baseUrl}/budgets/statistics`;
+    
+    // Add entityId as a query parameter if provided
+    if (entityId) {
+      url = `${url}?entityId=${entityId}`;
+    }
+    
+    return this.http.get<any>(url);
+  }
+
   createBudget(budget: any): Observable<any> {
     return this.post('/budgets', budget);
   }

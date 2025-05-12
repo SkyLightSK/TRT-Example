@@ -50,6 +50,7 @@ export interface BudgetSummary {
   categories: BudgetCategorySummary[];
   startDate: Date | string;
   endDate: Date | string;
+  entitiesBreakdown?: EntityBreakdown[];
 }
 
 export interface BudgetCategorySummary {
@@ -66,6 +67,7 @@ export interface BudgetStatistics {
   totalSpent: number;
   overallUtilization: number;
   categoryBreakdown: CategoryBreakdown[];
+  entitiesBreakdown: EntityBreakdown[];
 }
 
 export interface YearlyBudgetTrend {
@@ -79,6 +81,14 @@ export interface CategoryBreakdown {
   name: string;
   amount: number;
   percentage: number;
+}
+
+export interface EntityBreakdown {
+  id: number;
+  name: string;
+  totalBudget: number;
+  spentToDate: number;
+  utilization: number;
 }
 
 @Injectable({
@@ -196,7 +206,8 @@ export class BudgetService {
               entityId: entity.id,
               categories: categories,
               startDate: currentBudget.startDate,
-              endDate: currentBudget.endDate
+              endDate: currentBudget.endDate,
+              entitiesBreakdown: []
             };
           })
         );
@@ -217,190 +228,18 @@ export class BudgetService {
       entityId: 0,
       categories: [],
       startDate: new Date(`${currentYear}-01-01`),
-      endDate: new Date(`${currentYear}-12-31`)
+      endDate: new Date(`${currentYear}-12-31`),
+      entitiesBreakdown: []
     };
   }
 
   getBudgetStatistics(entityId?: number): Observable<BudgetStatistics> {
-    // If no entity specified, return empty stats
-    if (!entityId) {
-      return of(this.createEmptyBudgetStatistics());
-    }
-    
-    // Get entity info
-    return this.apiService.getEntity(entityId).pipe(
-      switchMap(entity => {
-        // 1. Get all budgets
-        return this.getBudgets().pipe(
-          switchMap(budgets => {
-            // 2. Filter by entity if provided, otherwise use all entities
-            let filteredBudgets = budgets;
-            if (entityId) {
-              filteredBudgets = budgets.filter(budget => budget.entityId === entityId);
-            }
-            
-            if (filteredBudgets.length === 0) {
-              return of(this.createEmptyBudgetStatistics());
-            }
-
-            // 3. Sort budgets by year
-            filteredBudgets.sort((a, b) => a.fiscalYear - b.fiscalYear);
-            
-            // Get all unique entities
-            const entityIds = [...new Set(filteredBudgets.map(budget => budget.entityId))];
-            
-            // Get entity details for all entities (in parallel)
-            return forkJoin(
-              entityIds.map(id => 
-                this.http.get<Entity>(`${this.baseUrl}${environment.entityApiPath}/${id}`).pipe(
-                  catchError(() => of({ id, name: `Entity ${id}`, description: '', code: '', parentId: null }))
-                )
-              )
-            ).pipe(
-              switchMap(entities => {
-                const entityMap = new Map<number, Entity>();
-                entities.forEach(entity => entityMap.set(entity.id, entity));
-                
-                return forkJoin(
-                  filteredBudgets.map(budget => 
-                    this.getBudgetItems(budget.id).pipe(
-                      catchError(() => of([]))
-                    )
-                  )
-                ).pipe(
-                  map(allBudgetItems => {
-                    // Group budgets by year to aggregate multiple entities for the same year
-                    const budgetsByYear = new Map<number, { 
-                      budgets: Budget[], 
-                      items: BudgetItem[][],
-                      totalAmount: number
-                    }>();
-                    
-                    filteredBudgets.forEach((budget, index) => {
-                      const year = budget.fiscalYear;
-                      const yearData = budgetsByYear.get(year) || { budgets: [], items: [], totalAmount: 0 };
-                      yearData.budgets.push(budget);
-                      yearData.items.push(allBudgetItems[index]);
-                      yearData.totalAmount += Number(budget.totalAmount) || 0;
-                      budgetsByYear.set(year, yearData);
-                    });
-                    
-                    // Calculate yearly trends based on aggregated data
-                    const yearlyTrends: YearlyBudgetTrend[] = Array.from(budgetsByYear.entries()).map(([year, data]) => {
-                      // For simplicity, we'll simulate spent amount as 30-80% of total budget
-                      // with higher percentages for older years
-                      const currentYear = new Date().getFullYear();
-                      const spentRatio = Math.min(0.3 + (0.5 * ((year - currentYear + 3) / 5)), 0.95);
-                      const spentToDate = data.totalAmount * spentRatio;
-                      const utilization = (spentToDate / data.totalAmount) * 100;
-                      
-                      return {
-                        year,
-                        totalBudget: data.totalAmount,
-                        spentToDate: spentToDate,
-                        utilization: Math.round(utilization)
-                      };
-                    });
-                    
-                    // Sort trends by year
-                    yearlyTrends.sort((a, b) => a.year - b.year);
-                    
-                    // Aggregate all budget items for category breakdown
-                    const categoryMap = new Map<string, number>();
-                    let totalAmount = 0;
-                    
-                    allBudgetItems.flat().forEach(item => {
-                      if (!item) return;
-                      const category = item.description.split(':')[0].trim();
-                      const amount = Number(item.amount) || 0;
-                      const currentAmount = categoryMap.get(category) || 0;
-                      categoryMap.set(category, currentAmount + amount);
-                      totalAmount += amount;
-                    });
-                    
-                    // Create category breakdown
-                    const categoryBreakdown: CategoryBreakdown[] = [];
-                    
-                    categoryMap.forEach((amount, name) => {
-                      categoryBreakdown.push({
-                        name,
-                        amount,
-                        percentage: totalAmount > 0 ? Math.round((amount / totalAmount) * 100) : 0
-                      });
-                    });
-                    
-                    // Sort categories by amount
-                    categoryBreakdown.sort((a, b) => b.amount - a.amount);
-                    
-                    // Calculate overall metrics
-                    const totalAllocated = filteredBudgets.reduce((sum, budget) => {
-                      const amount = Number(budget.totalAmount);
-                      return sum + (isNaN(amount) ? 0 : amount);
-                    }, 0);
-                    
-                    const totalSpent = yearlyTrends.reduce((sum, trend) => {
-                      const spent = Number(trend.spentToDate);
-                      return sum + (isNaN(spent) ? 0 : spent);
-                    }, 0);
-                    
-                    const overallUtilization = totalAllocated > 0 ? Math.round((totalSpent / totalAllocated) * 100) : 0;
-                    
-                    // Get entity names for display
-                    let entityName = "All Entities";
-                    if (entityId && entityMap.has(entityId)) {
-                      entityName = entityMap.get(entityId)!.name;
-                    } else if (entityIds.length === 1 && entityMap.has(entityIds[0])) {
-                      entityName = entityMap.get(entityIds[0])!.name;
-                    }
-                    
-                    // Find current year budget
-                    const currentYear = new Date().getFullYear();
-                    const currentYearData = budgetsByYear.get(currentYear);
-                    
-                    let currentBudgetSummary: BudgetSummary | null = null;
-                    
-                    if (currentYearData) {
-                      const categories = this.calculateCategoriesFromItems(currentYearData.items.flat());
-                      const yearTrend = yearlyTrends.find(trend => trend.year === currentYear) || {
-                        year: currentYear,
-                        totalBudget: 0,
-                        spentToDate: 0,
-                        utilization: 0
-                      };
-                      
-                      // Use the first budget's dates as representative
-                      const representativeBudget = currentYearData.budgets[0];
-                      
-                      currentBudgetSummary = {
-                        id: 0, // Not applicable for aggregated view
-                        totalBudget: currentYearData.totalAmount,
-                        spentToDate: yearTrend.spentToDate,
-                        utilization: yearTrend.utilization,
-                        year: currentYear,
-                        name: `FY ${currentYear} Budget${currentYearData.budgets.length > 1 ? ' (Aggregated)' : ''}`,
-                        entityName: entityName,
-                        entityId: entityId || 0,
-                        categories: categories,
-                        startDate: representativeBudget?.startDate,
-                        endDate: representativeBudget?.endDate
-                      };
-                    }
-                    
-                    return {
-                      currentBudget: currentBudgetSummary,
-                      yearlyTrends: yearlyTrends,
-                      entityName: entityName,
-                      totalAllocated: totalAllocated,
-                      totalSpent: totalSpent,
-                      overallUtilization: overallUtilization,
-                      categoryBreakdown: categoryBreakdown
-                    };
-                  })
-                );
-              })
-            );
-          })
-        );
+    // Use the new API endpoint for budget statistics
+    return this.apiService.getBudgetStatistics(entityId).pipe(
+      catchError(error => {
+        console.error('Error fetching budget statistics:', error);
+        // Return sample data on error
+        return of(this.createEmptyBudgetStatistics());
       })
     );
   }
@@ -431,14 +270,16 @@ export class BudgetService {
   }
   
   private createEmptyBudgetStatistics(): BudgetStatistics {
+    // Create empty data structure that honestly shows no data is available
     return {
       currentBudget: null,
       yearlyTrends: [],
-      entityName: 'Unknown',
+      entityName: 'No Entities',
       totalAllocated: 0,
       totalSpent: 0,
       overallUtilization: 0,
-      categoryBreakdown: []
+      categoryBreakdown: [],
+      entitiesBreakdown: []
     };
   }
 }

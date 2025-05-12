@@ -1,6 +1,6 @@
 <div class="eol-widget">
   <div class="card-header">
-    <h2>Upcoming End-of-Life Devices</h2>
+    <h2>Upcoming Warranty Expirations</h2>
     <span class="badge system-wide">System-wide</span>
   </div>
   
@@ -26,19 +26,19 @@
       
       <div *ngIf="!upcomingEolDevices || upcomingEolDevices.length === 0" class="no-devices">
         <div class="empty-icon">📅</div>
-        <p class="empty-message">No upcoming EOL devices</p>
+        <p class="empty-message">No upcoming warranty expirations</p>
       </div>
     </ng-container>
     
     <ng-template #loadingTemplate>
       <div class="loading-container">
         <div class="loading-spinner"></div>
-        <p>Loading EOL devices...</p>
+        <p>Loading devices with upcoming warranty expirations...</p>
       </div>
     </ng-template>
   </div>
   
   <div class="card-footer">
-    <a routerLink="/devices/eol" class="view-all-link">View all EOL devices</a>
+    <a routerLink="/hardware" class="view-all-link">View all devices</a>
   </div>
 </div>

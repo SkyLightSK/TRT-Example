@@ -3,17 +3,29 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
+export enum DeviceType {
+  Kiosk = 'Kiosk',
+  Register = 'Register',
+  DMB = 'DMB',
+  Enclosure = 'Enclosure'
+}
+
+export enum DeviceStatus {
+  Active = 'Active',
+  Required = 'Required',
+  Retired = 'Retired'
+}
+
 export interface Device {
   id: number;
-  nsn: string;
-  type: string;
-  manufacturer: string;
+  name: string;
+  serialNumber: string;
   model: string;
-  location: string;
-  endOfLife: Date | string;
-  status: 'Active' | 'Required' | 'Retired';
-  eligibleUpgrade: string | null;
-  entityId: number;
+  deviceType: DeviceType;
+  deviceStatus: DeviceStatus;
+  purchaseDate?: Date | string;
+  warrantyExpiration?: Date | string;
+  entityId?: number;
   createdAt: Date | string;
   updatedAt: Date | string;
 }
@@ -31,8 +43,8 @@ export interface DeviceStatusSummary {
 export class DeviceService {
   constructor(private apiService: ApiService) {}
 
-  getDevices(): Observable<Device[]> {
-    return this.apiService.getDevices();
+  getDevices(entityId?: number): Observable<Device[]> {
+    return this.apiService.getDevices(entityId);
   }
 
   getDevice(id: number): Observable<Device> {
@@ -51,11 +63,11 @@ export class DeviceService {
 
         devices.forEach(device => {
           // Count devices by status
-          if (device.status === 'Active') {
+          if (device.deviceStatus === DeviceStatus.Active) {
             summary.Active++;
-          } else if (device.status === 'Required') {
+          } else if (device.deviceStatus === DeviceStatus.Required) {
             summary.Required++;
-          } else if (device.status === 'Retired') {
+          } else if (device.deviceStatus === DeviceStatus.Retired) {
             summary.Retired++;
           }
         });
@@ -65,7 +77,7 @@ export class DeviceService {
     );
   }
 
-  getUpcomingEndOfLifeDevices(): Observable<Device[]> {
+  getUpcomingWarrantyExpirationDevices(): Observable<Device[]> {
     return this.getDevices().pipe(
       map(devices => {
         const today = new Date();
@@ -74,11 +86,16 @@ export class DeviceService {
 
         return devices
           .filter(device => {
-            const warrantyExpirationDate = new Date(device.endOfLife);
+            if (!device.warrantyExpiration) return false;
+            const warrantyExpirationDate = new Date(device.warrantyExpiration);
             return warrantyExpirationDate > today && warrantyExpirationDate <= ninetyDaysFromNow;
           })
-          .sort((a, b) => new Date(a.endOfLife).getTime() - new Date(b.endOfLife).getTime())
-          .slice(0, 5); // Get top 5 upcoming EOL devices
+          .sort((a, b) => {
+            const dateA = a.warrantyExpiration ? new Date(a.warrantyExpiration).getTime() : 0;
+            const dateB = b.warrantyExpiration ? new Date(b.warrantyExpiration).getTime() : 0;
+            return dateA - dateB;
+          })
+          .slice(0, 5); // Get top 5 upcoming warranty expiration devices
       })
     );
   }

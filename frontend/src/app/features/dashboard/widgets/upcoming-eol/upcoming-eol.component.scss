@@ -157,3 +157,27 @@
     }
   }
 }
+
+.device-status {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  font-weight: 500;
+  
+  &.critical {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+  }
+  
+  &.warning {
+    background-color: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+  }
+  
+  &.normal {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+  }
+}

@@ -16,10 +16,9 @@ export class DeviceStatusComponent {
 
   getStatusColorClass(status: string): string {
     switch (status) {
-      case 'active': return 'status-good';
-      case 'needsAttention': return 'status-warning';
-      case 'critical': return 'status-critical';
-      case 'endOfLife': return 'status-inactive';
+      case 'Active': return 'status-good';
+      case 'Required': return 'status-warning';
+      case 'Retired': return 'status-inactive';
       default: return 'status-unknown';
     }
   }

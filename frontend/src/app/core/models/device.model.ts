@@ -4,7 +4,7 @@ export interface Device {
   type: string;
   model: string;
   serialNumber: string;
-  status: 'online' | 'offline' | 'maintenance' | 'unknown';
+  status: 'Active' | 'Required' | 'Retired';
   lastCheckedIn: string;
   installationDate: string;
   eolDate: string;
@@ -14,10 +14,9 @@ export interface Device {
 }
 
 export interface DeviceStatusSummary {
-  online: number;
-  offline: number;
-  maintenance: number;
-  unknown: number;
+  Active: number;
+  Required: number;
+  Retired: number;
   total: number;
 }
 
@@ -28,4 +27,4 @@ export interface UpcomingEOLDevice {
   daysUntilEol: number;
   model: string;
   type: string;
-} 
+}

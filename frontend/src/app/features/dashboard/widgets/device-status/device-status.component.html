@@ -7,34 +7,26 @@
     <ng-container *ngIf="!loading; else loadingTemplate">
       <div *ngIf="deviceStatus" class="status-grid">
         <div class="status-item">
-          <div class="status-count">{{deviceStatus.active}}</div>
+          <div class="status-count">{{deviceStatus.Active}}</div>
           <div class="status-label">Active</div>
           <div class="status-bar">
-            <div class="status-bar-fill status-good" [style.width.%]="getPercentage(deviceStatus.active)"></div>
+            <div class="status-bar-fill status-good" [style.width.%]="getPercentage(deviceStatus.Active)"></div>
           </div>
         </div>
         
         <div class="status-item">
-          <div class="status-count">{{deviceStatus.needsAttention}}</div>
-          <div class="status-label">Needs Attention</div>
+          <div class="status-count">{{deviceStatus.Required}}</div>
+          <div class="status-label">Required</div>
           <div class="status-bar">
-            <div class="status-bar-fill status-warning" [style.width.%]="getPercentage(deviceStatus.needsAttention)"></div>
+            <div class="status-bar-fill status-warning" [style.width.%]="getPercentage(deviceStatus.Required)"></div>
           </div>
         </div>
         
         <div class="status-item">
-          <div class="status-count">{{deviceStatus.critical}}</div>
-          <div class="status-label">Critical</div>
+          <div class="status-count">{{deviceStatus.Retired}}</div>
+          <div class="status-label">Retired</div>
           <div class="status-bar">
-            <div class="status-bar-fill status-critical" [style.width.%]="getPercentage(deviceStatus.critical)"></div>
-          </div>
-        </div>
-        
-        <div class="status-item">
-          <div class="status-count">{{deviceStatus.endOfLife}}</div>
-          <div class="status-label">End of Life</div>
-          <div class="status-bar">
-            <div class="status-bar-fill status-inactive" [style.width.%]="getPercentage(deviceStatus.endOfLife)"></div>
+            <div class="status-bar-fill status-inactive" [style.width.%]="getPercentage(deviceStatus.Retired)"></div>
           </div>
         </div>
       </div>

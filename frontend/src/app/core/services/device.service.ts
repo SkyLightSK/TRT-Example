@@ -11,7 +11,7 @@ export interface Device {
   model: string;
   location: string;
   endOfLife: Date | string;
-  status: string;
+  status: 'Active' | 'Required' | 'Retired';
   eligibleUpgrade: string | null;
   entityId: number;
   createdAt: Date | string;
@@ -20,10 +20,9 @@ export interface Device {
 
 export interface DeviceStatusSummary {
   total: number;
-  active: number;
-  needsAttention: number;
-  critical: number;
-  endOfLife: number;
+  Active: number;
+  Required: number;
+  Retired: number;
 }
 
 @Injectable({
@@ -47,26 +46,19 @@ export class DeviceService {
       map(devices => {
         const summary: DeviceStatusSummary = {
           total: devices.length,
-          active: 0,
-          needsAttention: 0,
-          critical: 0,
-          endOfLife: 0
+          Active: 0,
+          Required: 0,
+          Retired: 0
         };
 
         devices.forEach(device => {
-          // Calculate based on device status and endOfLife date
-          const endOfLifeDate = new Date(device.endOfLife);
-          const today = new Date();
-          const daysUntilEol = Math.floor((endOfLifeDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-
-          if (daysUntilEol < 0) {
-            summary.endOfLife++;
-          } else if (daysUntilEol <= 30) {
-            summary.critical++;
-          } else if (daysUntilEol <= 90) {
-            summary.needsAttention++;
-          } else {
-            summary.active++;
+          // Count devices by status
+          if (device.status === 'Active') {
+            summary.Active++;
+          } else if (device.status === 'Required') {
+            summary.Required++;
+          } else if (device.status === 'Retired') {
+            summary.Retired++;
           }
         });
 
@@ -84,12 +76,12 @@ export class DeviceService {
 
         return devices
           .filter(device => {
-            const endOfLifeDate = new Date(device.endOfLife);
-            return endOfLifeDate > today && endOfLifeDate <= ninetyDaysFromNow;
+            const warrantyExpirationDate = new Date(device.endOfLife);
+            return warrantyExpirationDate > today && warrantyExpirationDate <= ninetyDaysFromNow;
           })
           .sort((a, b) => new Date(a.endOfLife).getTime() - new Date(b.endOfLife).getTime())
           .slice(0, 5); // Get top 5 upcoming EOL devices
       })
     );
   }
-} 
+}

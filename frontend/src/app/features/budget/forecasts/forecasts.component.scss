@@ -60,4 +60,14 @@ mat-card {
 
 .stable {
   color: #ff9800;
+}
+
+.mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .header-actions {
+    margin-right: 16px;
+  }
 } 

@@ -233,4 +233,12 @@ export class BudgetListComponent implements OnInit {
       });
     }
   }
+
+  refreshData(): void {
+    if (this.activeTab === 'budgets') {
+      this.loadBudgets();
+    } else if (this.activeTab === 'items') {
+      this.loadBudgetItems();
+    }
+  }
 } 

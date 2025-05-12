@@ -2,7 +2,7 @@
   <div class="admin-header">
     <h1>Entity Management</h1>
     <div class="action-buttons">
-      <button mat-raised-button color="accent" (click)="loadEntities()">
+      <button mat-raised-button color="accent" (click)="loadEntities(currentParentId)">
         <mat-icon>refresh</mat-icon>
         Refresh Data
       </button>
@@ -11,6 +11,18 @@
         Add Entity
       </button>
     </div>
+  </div>
+
+  <!-- Breadcrumbs navigation -->
+  <div class="breadcrumbs" *ngIf="breadcrumbs.length > 0">
+    <span class="breadcrumb-item clickable" (click)="navigateToBreadcrumb(null)">Root</span>
+    <span class="breadcrumb-separator">/</span>
+    <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+      <span class="breadcrumb-item" [class.clickable]="!last" [class.active]="last" (click)="!last && navigateToBreadcrumb(crumb)">
+        {{ crumb.name }}
+      </span>
+      <span class="breadcrumb-separator" *ngIf="!last">/</span>
+    </ng-container>
   </div>
 
   <mat-form-field class="filter-field">
@@ -42,7 +54,7 @@
       <ng-container matColumnDef="parent">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Parent</th>
         <td mat-cell *matCellDef="let entity">
-          {{entity.parentName || 'None'}}
+          {{entity.parent?.name || 'None'}}
         </td>
       </ng-container>
 
@@ -50,10 +62,10 @@
       <ng-container matColumnDef="childCount">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Children</th>
         <td mat-cell *matCellDef="let entity">
-          <span *ngIf="entity.childCount > 0" class="clickable" (click)="viewChildren(entity)">
+          <span *ngIf="entity.childCount && entity.childCount > 0" class="clickable" (click)="viewChildren(entity)">
             {{entity.childCount}} <mat-icon class="small-icon">visibility</mat-icon>
           </span>
-          <span *ngIf="entity.childCount === 0">0</span>
+          <span *ngIf="!entity.childCount || entity.childCount === 0">0</span>
         </td>
       </ng-container>
 
@@ -69,9 +81,13 @@
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
-            <button mat-menu-item *ngIf="entity.childCount === 0" (click)="confirmDelete(entity)">
+            <button mat-menu-item *ngIf="!entity.childCount || entity.childCount === 0" (click)="confirmDelete(entity)">
               <mat-icon>delete</mat-icon>
               <span>Delete</span>
+            </button>
+            <button mat-menu-item *ngIf="entity.childCount && entity.childCount > 0" (click)="viewChildren(entity)">
+              <mat-icon>folder_open</mat-icon>
+              <span>View Children</span>
             </button>
           </mat-menu>
         </td>

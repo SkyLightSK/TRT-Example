@@ -70,8 +70,7 @@ interface UpdateUserDto {
     MatTooltipModule,
     MatChipsModule,
     MatMenuModule,
-    MatProgressSpinnerModule,
-    UserFormDialogComponent
+    MatProgressSpinnerModule
   ],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss']

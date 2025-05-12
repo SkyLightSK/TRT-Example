@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../../../core/services/api.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 interface Budget {
   id: number;
@@ -26,7 +30,15 @@ interface BudgetItem {
 @Component({
   selector: 'app-budget-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    ReactiveFormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './budget-list.component.html',
   styleUrls: ['./budget-list.component.scss']
 })
@@ -35,11 +47,12 @@ export class BudgetListComponent implements OnInit {
   budgets: Budget[] = [];
   filteredBudgets: Budget[] = [];
   budgetItems: BudgetItem[] = [];
+  filteredBudgetItems: BudgetItem[] = [];
   
   // UI state
   selectedYear: number = new Date().getFullYear();
   availableYears: number[] = [];
-  activeTab: 'budgets' | 'items' = 'budgets';
+  selectedBudget: Budget | null = null;
   loading = false;
   loadingItems = false;
   showModal = false;
@@ -125,6 +138,8 @@ export class BudgetListComponent implements OnInit {
   onYearChange(year: number): void {
     this.selectedYear = year;
     this.loadBudgets();
+    this.selectedBudget = null;
+    this.filteredBudgetItems = [];
   }
 
   getTotalAmount(): number {
@@ -174,6 +189,10 @@ export class BudgetListComponent implements OnInit {
       this.apiService.deleteBudget(budget.id).subscribe({
         next: () => {
           this.loadBudgets();
+          if (this.selectedBudget?.id === budget.id) {
+            this.selectedBudget = null;
+            this.filteredBudgetItems = [];
+          }
         },
         error: (error) => {
           console.error('Error deleting budget:', error);
@@ -183,9 +202,29 @@ export class BudgetListComponent implements OnInit {
   }
 
   viewBudgetItems(budget: Budget): void {
-    this.activeTab = 'items';
-    // Optional: filter the items to show only those for the selected budget
-    // this.loadBudgetItemsByBudgetId(budget.id);
+    this.selectedBudget = budget;
+    this.loadBudgetItemsByBudgetId(budget.id);
+  }
+  
+  loadBudgetItemsByBudgetId(budgetId: number): void {
+    this.loadingItems = true;
+    this.apiService.getBudgetItems(budgetId).subscribe({
+      next: (data) => {
+        this.filteredBudgetItems = data;
+        this.loadingItems = false;
+        
+        console.log(`Loaded ${this.filteredBudgetItems.length} budget items for budget ID ${budgetId}`);
+      },
+      error: (error) => {
+        console.error('Error loading budget items:', error);
+        this.loadingItems = false;
+      }
+    });
+  }
+  
+  backToBudgetList(): void {
+    this.selectedBudget = null;
+    this.filteredBudgetItems = [];
   }
 
   onEditBudgetItem(item: BudgetItem): void {
@@ -194,8 +233,10 @@ export class BudgetListComponent implements OnInit {
   }
 
   onDeleteBudgetItem(item: BudgetItem): void {
-    // TODO: Implement budget item deletion
-    console.log('Delete budget item:', item);
+    if (confirm(`Are you sure you want to delete this budget item?`)) {
+      console.log('Delete budget item:', item);
+      this.filteredBudgetItems = this.filteredBudgetItems.filter(i => i.id !== item.id);
+    }
   }
 
   closeModal(): void {

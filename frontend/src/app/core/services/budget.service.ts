@@ -270,49 +270,16 @@ export class BudgetService {
   }
   
   private createEmptyBudgetStatistics(): BudgetStatistics {
-    // Create sample data for demonstration purposes
-    const currentYear = new Date().getFullYear();
-    
+    // Create empty data structure that honestly shows no data is available
     return {
-      currentBudget: {
-        id: 0,
-        totalBudget: 500000,
-        spentToDate: 275000,
-        utilization: 55,
-        year: currentYear,
-        name: `FY ${currentYear} Budget`,
-        entityName: 'Sample Entity',
-        entityId: 0,
-        categories: [
-          { name: 'Operations', amount: 200000, percentage: 40 },
-          { name: 'IT', amount: 150000, percentage: 30 },
-          { name: 'Marketing', amount: 100000, percentage: 20 },
-          { name: 'R&D', amount: 50000, percentage: 10 }
-        ],
-        startDate: new Date(`${currentYear}-01-01`),
-        endDate: new Date(`${currentYear}-12-31`),
-        entitiesBreakdown: []
-      },
-      yearlyTrends: [
-        { year: currentYear-3, totalBudget: 350000, spentToDate: 350000, utilization: 100 },
-        { year: currentYear-2, totalBudget: 400000, spentToDate: 380000, utilization: 95 },
-        { year: currentYear-1, totalBudget: 450000, spentToDate: 405000, utilization: 90 },
-        { year: currentYear, totalBudget: 500000, spentToDate: 275000, utilization: 55 }
-      ],
-      entityName: 'Sample Entity',
-      totalAllocated: 1700000,
-      totalSpent: 1410000,
-      overallUtilization: 83,
-      categoryBreakdown: [
-        { name: 'Operations', amount: 680000, percentage: 40 },
-        { name: 'IT', amount: 510000, percentage: 30 },
-        { name: 'Marketing', amount: 340000, percentage: 20 },
-        { name: 'R&D', amount: 170000, percentage: 10 }
-      ],
-      entitiesBreakdown: [
-        { id: 1, name: 'Sample Entity', totalBudget: 500000, spentToDate: 275000, utilization: 55 },
-        { id: 2, name: 'Another Entity', totalBudget: 1000000, spentToDate: 550000, utilization: 55 }
-      ]
+      currentBudget: null,
+      yearlyTrends: [],
+      entityName: 'No Entities',
+      totalAllocated: 0,
+      totalSpent: 0,
+      overallUtilization: 0,
+      categoryBreakdown: [],
+      entitiesBreakdown: []
     };
   }
 }

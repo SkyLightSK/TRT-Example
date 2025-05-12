@@ -10,100 +10,113 @@
     <ng-container *ngIf="!loading; else loadingTemplate">
       <ng-container *ngIf="!error; else errorTemplate">
         <div *ngIf="budgetStats" class="budget-stats">
-          <div class="stats-row">
-            <div class="stat-item">
-              <div class="stat-value">{{formatCurrency(budgetStats.totalAllocated)}}</div>
-              <div class="stat-label">Total Budget</div>
+          <!-- Show empty state message if no data available -->
+          <div *ngIf="!hasBudgetData()" class="empty-state">
+            <div class="empty-icon">
+              <mat-icon>account_balance_wallet</mat-icon>
             </div>
-            
-            <div class="stat-item">
-              <div class="stat-value">{{formatCurrency(budgetStats.totalSpent)}}</div>
-              <div class="stat-label">Spent To Date</div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-value">{{formatPercentage(budgetStats.overallUtilization)}}</div>
-              <div class="stat-label">Budget Utilization</div>
-            </div>
+            <h3>No Budget Data Available</h3>
+            <p>There are no budgets configured in the system.</p>
+            <a routerLink="/budget" class="create-budget-btn">Create Budget</a>
           </div>
           
-          <div class="budget-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" [style.width.%]="budgetStats.overallUtilization"></div>
-            </div>
-            <div class="progress-labels">
-              <span>0%</span>
-              <span>50%</span>
-              <span>100%</span>
-            </div>
-          </div>
-          
-          <!-- Entity Breakdown Section -->
-          <div *ngIf="budgetStats.entitiesBreakdown && budgetStats.entitiesBreakdown.length" class="entity-breakdown">
-            <h3>Entity Breakdown</h3>
-            <div class="entity-list">
-              <div *ngFor="let entity of budgetStats.entitiesBreakdown" class="entity-item">
-                <div class="entity-header">
-                  <span class="entity-name">{{entity.name}}</span>
-                  <span class="entity-budget">{{formatCurrency(entity.totalBudget)}}</span>
-                </div>
-                <div class="entity-progress">
-                  <div class="progress-bar">
-                    <div class="progress-fill" [style.width.%]="entity.utilization"></div>
-                  </div>
-                  <div class="entity-stats">
-                    <span>{{formatPercentage(entity.utilization)}}</span>
-                    <span>{{formatCurrency(entity.spentToDate)}} spent</span>
-                  </div>
-                </div>
+          <!-- Show budget data if available -->
+          <ng-container *ngIf="hasBudgetData()">
+            <div class="stats-row">
+              <div class="stat-item">
+                <div class="stat-value">{{formatCurrency(budgetStats.totalAllocated)}}</div>
+                <div class="stat-label">Total Budget</div>
               </div>
-            </div>
-          </div>
-          
-          <div *ngIf="budgetStats.yearlyTrends && budgetStats.yearlyTrends.length" class="yearly-trends">
-            <div class="trends-header">
-              <h3>Yearly Budget Trends</h3>
-              <div class="year-filters">
-                <button 
-                  *ngFor="let year of availableYears" 
-                  class="year-filter-btn" 
-                  [class.active]="selectedYears.includes(year)"
-                  (click)="toggleYearFilter(year)">
-                  {{year}}
-                </button>
+              
+              <div class="stat-item">
+                <div class="stat-value">{{formatCurrency(budgetStats.totalSpent)}}</div>
+                <div class="stat-label">Spent To Date</div>
+              </div>
+              
+              <div class="stat-item">
+                <div class="stat-value">{{formatPercentage(budgetStats.overallUtilization)}}</div>
+                <div class="stat-label">Budget Utilization</div>
               </div>
             </div>
             
-            <div class="trends-chart">
-              <div class="chart-bars">
-                <div *ngFor="let trend of getFilteredTrends()" class="chart-bar-group">
-                  <div class="chart-bar total" [style.height]="getTrendBarHeight(trend)">
-                    <div class="spent-overlay" [style.height]="getSpentBarHeight(trend)"></div>
-                  </div>
-                  <div class="bar-label">{{trend.year}}</div>
-                  <div class="bar-tooltip">
-                    <div>Total: {{formatCurrency(trend.totalBudget)}}</div>
-                    <div>Spent: {{formatCurrency(trend.spentToDate)}}</div>
-                    <div>Utilization: {{formatPercentage(trend.utilization)}}</div>
-                  </div>
-                </div>
+            <div class="budget-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="budgetStats.overallUtilization"></div>
               </div>
-              <div class="chart-legend">
-                <div class="legend-item">
-                  <div class="legend-color total"></div>
-                  <span>Total Budget</span>
-                </div>
-                <div class="legend-item">
-                  <div class="legend-color spent"></div>
-                  <span>Spent to Date</span>
+              <div class="progress-labels">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+            
+            <!-- Entity Breakdown Section -->
+            <div *ngIf="budgetStats.entitiesBreakdown && budgetStats.entitiesBreakdown.length" class="entity-breakdown">
+              <h3>Entity Breakdown</h3>
+              <div class="entity-list">
+                <div *ngFor="let entity of budgetStats.entitiesBreakdown" class="entity-item">
+                  <div class="entity-header">
+                    <span class="entity-name">{{entity.name}}</span>
+                    <span class="entity-budget">{{formatCurrency(entity.totalBudget)}}</span>
+                  </div>
+                  <div class="entity-progress">
+                    <div class="progress-bar">
+                      <div class="progress-fill" [style.width.%]="entity.utilization"></div>
+                    </div>
+                    <div class="entity-stats">
+                      <span>{{formatPercentage(entity.utilization)}}</span>
+                      <span>{{formatCurrency(entity.spentToDate)}} spent</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div *ngIf="!budgetStats.yearlyTrends || budgetStats.yearlyTrends.length === 0" class="no-data-message">
-            <p>No yearly budget trend data available.</p>
-          </div>
+            
+            <div *ngIf="budgetStats.yearlyTrends && budgetStats.yearlyTrends.length" class="yearly-trends">
+              <div class="trends-header">
+                <h3>Yearly Budget Trends</h3>
+                <div class="year-filters">
+                  <button 
+                    *ngFor="let year of availableYears" 
+                    class="year-filter-btn" 
+                    [class.active]="selectedYears.includes(year)"
+                    (click)="toggleYearFilter(year)">
+                    {{year}}
+                  </button>
+                </div>
+              </div>
+              
+              <div class="trends-chart">
+                <div class="chart-bars">
+                  <div *ngFor="let trend of getFilteredTrends()" class="chart-bar-group">
+                    <div class="chart-bar total" [style.height]="getTrendBarHeight(trend)">
+                      <div class="spent-overlay" [style.height]="getSpentBarHeight(trend)"></div>
+                    </div>
+                    <div class="bar-label">{{trend.year}}</div>
+                    <div class="bar-tooltip">
+                      <div>Total: {{formatCurrency(trend.totalBudget)}}</div>
+                      <div>Spent: {{formatCurrency(trend.spentToDate)}}</div>
+                      <div>Utilization: {{formatPercentage(trend.utilization)}}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item">
+                    <div class="legend-color total"></div>
+                    <span>Total Budget</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color spent"></div>
+                    <span>Spent to Date</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="!budgetStats.yearlyTrends || budgetStats.yearlyTrends.length === 0" class="no-data-message">
+              <p>No yearly budget trend data available.</p>
+            </div>
+          </ng-container>
         </div>
         
         <div *ngIf="!budgetStats" class="no-data-message">

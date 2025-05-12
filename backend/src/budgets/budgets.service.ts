@@ -317,54 +317,18 @@ export class BudgetsService {
   }
   
   private createEmptyBudgetStatistics(): BudgetStatistics {
-    // Create sample data for demonstration purposes
+    // Create empty data structure that honestly shows no data is available
     const currentYear = new Date().getFullYear();
     
     return {
-      currentBudget: {
-        id: 0,
-        totalBudget: 500000,
-        spentToDate: 275000,
-        utilization: 55,
-        year: currentYear,
-        name: `FY ${currentYear} Budget`,
-        entityName: 'Sample Entity',
-        entityId: 0,
-        categories: [
-          { name: 'Operations', amount: 200000, percentage: 40 },
-          { name: 'IT', amount: 150000, percentage: 30 },
-          { name: 'Marketing', amount: 100000, percentage: 20 },
-          { name: 'R&D', amount: 50000, percentage: 10 }
-        ],
-        startDate: new Date(`${currentYear}-01-01`),
-        endDate: new Date(`${currentYear}-12-31`),
-        entitiesBreakdown: [
-          { id: 1, name: 'Sample Entity 1', totalBudget: 250000, spentToDate: 150000, utilization: 60 },
-          { id: 2, name: 'Sample Entity 2', totalBudget: 150000, spentToDate: 75000, utilization: 50 },
-          { id: 3, name: 'Sample Entity 3', totalBudget: 100000, spentToDate: 50000, utilization: 50 }
-        ]
-      },
-      yearlyTrends: [
-        { year: currentYear-3, totalBudget: 350000, spentToDate: 350000, utilization: 100 },
-        { year: currentYear-2, totalBudget: 400000, spentToDate: 380000, utilization: 95 },
-        { year: currentYear-1, totalBudget: 450000, spentToDate: 405000, utilization: 90 },
-        { year: currentYear, totalBudget: 500000, spentToDate: 275000, utilization: 55 }
-      ],
-      entityName: 'All Entities',
-      totalAllocated: 1700000,
-      totalSpent: 1410000,
-      overallUtilization: 83,
-      categoryBreakdown: [
-        { name: 'Operations', amount: 680000, percentage: 40 },
-        { name: 'IT', amount: 510000, percentage: 30 },
-        { name: 'Marketing', amount: 340000, percentage: 20 },
-        { name: 'R&D', amount: 170000, percentage: 10 }
-      ],
-      entitiesBreakdown: [
-        { id: 1, name: 'Sample Entity 1', totalBudget: 850000, spentToDate: 700000, utilization: 82 },
-        { id: 2, name: 'Sample Entity 2', totalBudget: 510000, spentToDate: 440000, utilization: 86 },
-        { id: 3, name: 'Sample Entity 3', totalBudget: 340000, spentToDate: 270000, utilization: 79 }
-      ]
+      currentBudget: null,
+      yearlyTrends: [],
+      entityName: 'No Entities',
+      totalAllocated: 0,
+      totalSpent: 0,
+      overallUtilization: 0,
+      categoryBreakdown: [],
+      entitiesBreakdown: []
     };
   }
 

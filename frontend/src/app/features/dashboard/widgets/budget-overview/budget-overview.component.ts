@@ -122,4 +122,15 @@ export class BudgetOverviewComponent implements OnInit, OnChanges {
       this.loadBudgetStatistics();
     }
   }
+
+  hasBudgetData(): boolean {
+    if (!this.budgetStats) return false;
+    
+    // Check if we have any meaningful data to display
+    return (
+      this.budgetStats.totalAllocated > 0 || 
+      this.budgetStats.entitiesBreakdown?.length > 0 || 
+      this.budgetStats.yearlyTrends?.length > 0
+    );
+  }
 }

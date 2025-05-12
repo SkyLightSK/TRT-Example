@@ -203,20 +203,36 @@ export class BudgetListComponent implements OnInit {
 
   viewBudgetItems(budget: Budget): void {
     this.selectedBudget = budget;
-    this.loadBudgetItemsByBudgetId(budget.id);
+    this.loadBudgetWithItems(budget.id);
   }
   
-  loadBudgetItemsByBudgetId(budgetId: number): void {
+  loadBudgetWithItems(budgetId: number): void {
     this.loadingItems = true;
-    this.apiService.getBudgetItems(budgetId).subscribe({
+    console.log(`Fetching budget with items for budget ID: ${budgetId}`);
+    
+    // Get the budget with its related items in one request
+    this.apiService.getBudget(budgetId).subscribe({
       next: (data) => {
-        this.filteredBudgetItems = data;
-        this.loadingItems = false;
+        console.log('Full API response:', data);
+        // Update the selected budget with the full data including items
+        this.selectedBudget = data;
         
-        console.log(`Loaded ${this.filteredBudgetItems.length} budget items for budget ID ${budgetId}`);
+        // Items are already part of the budget.items array
+        this.filteredBudgetItems = data.items || [];
+        
+        console.log(`Loaded budget with ${this.filteredBudgetItems.length} items`);
+        
+        // Log more details about the items
+        if (this.filteredBudgetItems.length > 0) {
+          console.log('First item example:', this.filteredBudgetItems[0]);
+        } else {
+          console.log('No items found for this budget');
+        }
+        
+        this.loadingItems = false;
       },
       error: (error) => {
-        console.error('Error loading budget items:', error);
+        console.error('Error loading budget with items:', error);
         this.loadingItems = false;
       }
     });

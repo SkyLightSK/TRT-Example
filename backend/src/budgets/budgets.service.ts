@@ -32,7 +32,7 @@ export class BudgetsService {
   async findOne(id: number): Promise<Budget> {
     const budget = await this.budgetsRepository.findOne({
       where: { id },
-      relations: ['items'],
+      relations: ['items', 'items.entity', 'entity'],
     });
 
     if (!budget) {
@@ -60,7 +60,9 @@ export class BudgetsService {
   }
 
   async findAllItems(): Promise<BudgetItem[]> {
-    return this.budgetItemsRepository.find();
+    return this.budgetItemsRepository.find({ 
+      relations: ['budget', 'entity'] 
+    });
   }
 
   async findOneItem(id: number): Promise<BudgetItem> {

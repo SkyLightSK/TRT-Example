@@ -4,11 +4,15 @@ import { Budget } from './entities/budget.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BudgetItem } from './entities/budget-item.entity';
 import { BudgetsService } from './budgets.service';
+import { BudgetItemsService } from './budget-items.service';
 
 @ApiTags('budgets')
 @Controller('budgets')
 export class BudgetsController {
-  constructor(private readonly budgetsService: BudgetsService) {}
+  constructor(
+    private readonly budgetsService: BudgetsService,
+    private readonly budgetItemsService: BudgetItemsService
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()

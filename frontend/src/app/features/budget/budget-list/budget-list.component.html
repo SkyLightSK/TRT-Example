@@ -82,8 +82,7 @@
     <div class="empty-state" *ngIf="!loadingItems && filteredBudgetItems.length === 0">
       <p>No budget items found for this budget.</p>
       <p>Budget ID: {{ selectedBudget.id }}</p>
-      <p>API call was made to: /budgets/items?budgetId={{ selectedBudget.id }}</p>
-      <p class="info">Check the browser console for more debugging information.</p>
+      <p>This budget has no associated items.</p>
       <!-- TODO: Add budget item creation button when implemented -->
     </div>
     

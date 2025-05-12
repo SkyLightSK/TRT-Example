@@ -27,7 +27,6 @@ export const tokenInterceptor: HttpInterceptorFn = (
   // Add auth token to the request
   const token = authService.getToken();
   if (token) {
-    console.log('Adding token to request:', request.url);
     request = addToken(request, token);
   } else {
     console.log('No token available for request:', request.url);
@@ -37,7 +36,6 @@ export const tokenInterceptor: HttpInterceptorFn = (
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
         // If unauthorized, redirect to login
-        console.log('Unauthorized request, redirecting to login');
         authService.logout();
         router.navigate(['/login']);
       }
@@ -51,7 +49,6 @@ function addToken(request: HttpRequest<unknown>, token: string): HttpRequest<unk
   let cleanToken = token;
   if (token.startsWith('"') && token.endsWith('"')) {
     cleanToken = token.substring(1, token.length - 1);
-    console.log('Cleaned token from quotes:', cleanToken);
   }
   
   const clonedRequest = request.clone({
@@ -60,7 +57,6 @@ function addToken(request: HttpRequest<unknown>, token: string): HttpRequest<unk
     }
   });
   
-  console.log('Request headers:', clonedRequest.headers.keys().map(key => `${key}: ${clonedRequest.headers.get(key)}`));
   
   return clonedRequest;
 } 

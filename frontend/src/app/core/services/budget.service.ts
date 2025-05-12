@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
+import { ApiService } from './api.service';
+import { environment } from '../../../environments/environment';
 
 export interface Budget {
   id: number;
@@ -83,30 +85,29 @@ export interface CategoryBreakdown {
   providedIn: 'root'
 })
 export class BudgetService {
-  private baseUrl = 'http://localhost:3000/api';
+  private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private apiService: ApiService,
+    private http: HttpClient
+  ) {}
 
   getBudgets(): Observable<Budget[]> {
-    return this.http.get<Budget[]>(`${this.baseUrl}/budgets`);
+    return this.apiService.getBudgets();
   }
 
   getBudgetItems(budgetId?: number): Observable<BudgetItem[]> {
-    const url = budgetId 
-      ? `${this.baseUrl}/budgets/${budgetId}/items` 
-      : `${this.baseUrl}/budgets/items`;
-    
-    return this.http.get<BudgetItem[]>(url);
+    return this.apiService.getBudgetItems(budgetId);
   }
 
   getEntities(): Observable<Entity[]> {
-    return this.http.get<Entity[]>(`${this.baseUrl}/entities`);
+    return this.apiService.getEntities();
   }
 
   getBudgetWithEntity(budgetId: number): Observable<Budget> {
-    return this.http.get<Budget>(`${this.baseUrl}/budgets/${budgetId}`).pipe(
+    return this.apiService.getBudget(budgetId).pipe(
       switchMap(budget => {
-        return this.http.get<Entity>(`${this.baseUrl}/entities/${budget.entityId}`).pipe(
+        return this.apiService.getEntity(budget.entityId).pipe(
           map(entity => {
             return { ...budget, entity };
           }),
@@ -140,7 +141,7 @@ export class BudgetService {
 
         // 4. Get related data (entity and budget items)
         return forkJoin({
-          entity: this.http.get<Entity>(`${this.baseUrl}/entities/${currentBudget.entityId}`).pipe(
+          entity: this.apiService.getEntity(currentBudget.entityId).pipe(
             catchError(() => of({ id: 0, name: 'Unknown', description: '', code: '', parentId: null }))
           ),
           budgetItems: this.getBudgetItems(currentBudget.id).pipe(
@@ -221,6 +222,70 @@ export class BudgetService {
   }
 
   getBudgetStatistics(entityId?: number): Observable<BudgetStatistics> {
+    // If no entity specified, return empty stats
+    if (!entityId) {
+      return of(this.createEmptyBudgetStatistics());
+    }
+    
+    // Get entity info
+    return this.apiService.getEntity(entityId).pipe(
+      switchMap(entity => {
+        // 1. Get all budgets
+        return this.getBudgets().pipe(
+          switchMap(budgets => {
+            // 2. Filter by entity if provided, otherwise use all entities
+            let filteredBudgets = budgets;
+            if (entityId) {
+              filteredBudgets = budgets.filter(budget => budget.entityId === entityId);
+            }
+            
+            if (filteredBudgets.length === 0) {
+              return of(this.createEmptyBudgetStatistics());
+            }
+
+            // 3. Sort budgets by year
+            filteredBudgets.sort((a, b) => a.fiscalYear - b.fiscalYear);
+            
+            // Get all unique entities
+            const entityIds = [...new Set(filteredBudgets.map(budget => budget.entityId))];
+            
+            // Get entity details for all entities (in parallel)
+            return forkJoin(
+              entityIds.map(id => 
+                this.apiService.get<Entity>(`${this.baseUrl}${environment.entityApiPath}/${id}`).pipe(
+                  catchError(() => of({ id, name: `Entity ${id}`, description: '', code: '', parentId: null }))
+                )
+              )
+            ).pipe(
+              switchMap(entities => {
+                const entityMap = new Map<number, Entity>();
+                entities.forEach(entity => entityMap.set(entity.id, entity));
+                
+                return forkJoin(
+                  filteredBudgets.map(budget => 
+                    this.getBudgetItems(budget.id).pipe(
+                      catchError(() => of([]))
+                    )
+                  )
+                ).pipe(
+                  map(allBudgetItems => {
+                    // Group budgets by year to aggregate multiple entities for the same year
+                    const budgetsByYear = new Map<number, { 
+                      budgets: Budget[], 
+                      items: BudgetItem[][],
+                      totalAmount: number
+                    }>();
+                    
+                    filteredBudgets.forEach((budget, index) => {
+                      const year = budget.fiscalYear;
+                      const yearData = budgetsByYear.get(year) || { budgets: [], items: [], totalAmount: 0 };
+                      yearData.budgets.push(budget);
+                      yearData.items.push(allBudgetItems[index]);
+                      yearData.totalAmount += Number(budget.totalAmount) || 0;
+                      budgetsByYear.set(year, yearData);
+                    });
+                    
+                    // Calculate yearly trends based on aggregated data
     // 1. Get all budgets
     return this.getBudgets().pipe(
       switchMap(budgets => {
@@ -243,7 +308,7 @@ export class BudgetService {
         // Get entity details for all entities (in parallel)
         return forkJoin(
           entityIds.map(id => 
-            this.http.get<Entity>(`${this.baseUrl}/entities/${id}`).pipe(
+            this.apiService.get<Entity>(`${this.baseUrl}${environment.entityApiPath}/${id}`).pipe(
               catchError(() => of({ id, name: `Entity ${id}`, description: '', code: '', parentId: null }))
             )
           )

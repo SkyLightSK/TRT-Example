@@ -3,15 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { Notification } from '../../features/dashboard/widgets/recent-notifications/recent-notifications.component';
-
-// Define a default API URL as fallback
-const API_URL = 'http://localhost:3000/api';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = `${API_URL}/notifications`;
+  private apiUrl = `${environment.apiUrl}${environment.notificationApiPath}`;
 
   constructor(private http: HttpClient) {}
 

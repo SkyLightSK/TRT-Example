@@ -2,6 +2,45 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.11.
 
+## Environment Configuration
+
+The application uses environment-specific configuration files located in `src/environments/`:
+
+- `environment.ts` - Development environment (default)
+- `environment.prod.ts` - Production environment 
+- `environment.staging.ts` - Staging environment
+
+These files contain environment-specific variables such as API URLs, feature flags, and other configuration:
+
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+  authApiPath: '/auth',
+  deviceApiPath: '/devices',
+  budgetApiPath: '/budgets',
+  entityApiPath: '/entities',
+  notificationApiPath: '/notifications',
+  appName: 'TRT Portal',
+  logLevel: 'debug',
+};
+```
+
+### Building for Different Environments
+
+To build the application for a specific environment, use:
+
+```bash
+# Development build (default)
+ng build
+
+# Production build
+ng build --configuration=production
+
+# Staging build
+ng build --configuration=staging
+```
+
 ## Development server
 
 To start a local development server, run:

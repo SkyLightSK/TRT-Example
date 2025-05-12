@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ApiService } from './api.service';
 
 export interface Device {
   id: number;
@@ -29,16 +29,14 @@ export interface DeviceStatusSummary {
   providedIn: 'root'
 })
 export class DeviceService {
-  private baseUrl = 'http://localhost:3000/api/devices';
-
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   getDevices(): Observable<Device[]> {
-    return this.http.get<Device[]>(this.baseUrl);
+    return this.apiService.getDevices();
   }
 
   getDevice(id: number): Observable<Device> {
-    return this.http.get<Device>(`${this.baseUrl}/${id}`);
+    return this.apiService.getDevice(id);
   }
 
   getDeviceStatusSummary(): Observable<DeviceStatusSummary> {

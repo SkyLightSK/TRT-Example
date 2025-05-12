@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
+import { ApiService } from './api.service';
 
 export interface User {
   id: number;
@@ -20,7 +22,6 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:3000/api/auth';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private tokenExpirationTimer: any;
 
@@ -28,7 +29,8 @@ export class AuthService {
   
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService
   ) {
     this.loadStoredAuthData();
   }
@@ -49,7 +51,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { username, password })
+    return this.apiService.login(username, password)
       .pipe(
         tap(response => this.handleAuthentication(response)),
         catchError(error => {
@@ -78,7 +80,7 @@ export class AuthService {
   }
 
   refreshToken(): Observable<string> {
-    return this.http.post<{ access_token: string }>(`${this.baseUrl}/refresh`, {})
+    return this.apiService.refreshToken()
       .pipe(
         map(response => {
           localStorage.setItem('token', response.access_token);
@@ -92,7 +94,7 @@ export class AuthService {
   }
 
   getProfile(): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/me`)
+    return this.apiService.getProfile()
       .pipe(
         tap(user => {
           localStorage.setItem('user', JSON.stringify(user));
@@ -102,7 +104,7 @@ export class AuthService {
   }
 
   impersonateEntity(entityId: number): Observable<{ access_token: string }> {
-    return this.http.post<{ access_token: string }>(`${this.baseUrl}/impersonate`, { entityId })
+    return this.apiService.impersonateEntity(entityId)
       .pipe(
         tap(response => {
           localStorage.setItem('token', response.access_token);

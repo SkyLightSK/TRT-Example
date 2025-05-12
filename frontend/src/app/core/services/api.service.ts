@@ -103,8 +103,12 @@ export class ApiService {
   }
   
   // Budget Items endpoints
-  getBudgetItems(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/budgets/items`);
+  getBudgetItems(budgetId?: number): Observable<any> {
+    let url = `${this.baseUrl}/budgets/items`;
+    if (budgetId) {
+      url += `?budgetId=${budgetId}`;
+    }
+    return this.http.get(url);
   }
   
   getBudgetItem(id: number): Observable<any> {

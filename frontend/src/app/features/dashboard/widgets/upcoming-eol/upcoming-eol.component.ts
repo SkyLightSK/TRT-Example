@@ -24,6 +24,16 @@ export class UpcomingEolComponent {
     }
   }
 
+  getDeviceStatusLabel(daysUntilEol: number): string {
+    if (daysUntilEol <= 30) {
+      return 'Retirement Imminent';
+    } else if (daysUntilEol <= 90) {
+      return 'Approaching Retirement';
+    } else {
+      return 'Active';
+    }
+  }
+
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {

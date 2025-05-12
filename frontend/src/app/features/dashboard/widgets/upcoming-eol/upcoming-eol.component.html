@@ -11,6 +11,9 @@
           <div class="device-info">
             <div class="device-name">{{device.name}}</div>
             <div class="device-model">{{device.model}} ({{device.type}})</div>
+            <div class="device-status" [ngClass]="getStatusClass(device.daysUntilEol)">
+              {{getDeviceStatusLabel(device.daysUntilEol)}}
+            </div>
           </div>
           <div class="eol-info">
             <div class="days-remaining" [ngClass]="getStatusClass(device.daysUntilEol)">

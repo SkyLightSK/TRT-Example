@@ -17,9 +17,30 @@ npm install
 cp .env.example .env
 ```
 
-## Configuration
+## Environment Configuration
 
-Edit the `.env` file with your database credentials and other settings.
+The application uses environment variables for configuration, which are validated using Zod. The main configurations include:
+
+### Server Configuration
+- `NODE_ENV` - Environment mode (development, production, test)
+- `PORT` - Server port (default: 3000)
+- `API_PREFIX` - Global API prefix (default: api)
+
+### Database Configuration
+- `DB_HOST` - Database host (default: localhost)
+- `DB_PORT` - Database port (default: 5432)
+- `DB_USERNAME` - Database username
+- `DB_PASSWORD` - Database password
+- `DB_DATABASE` - Database name
+
+### Security
+- `JWT_SECRET` - Secret key for JWT token generation
+- `JWT_EXPIRES_IN` - JWT token expiration (default: 1d)
+
+### CORS Settings
+- `CORS_ORIGIN` - Allowed origins for CORS
+
+You can find all these settings in the `.env.example` file. Copy this file to `.env` and adjust the values as needed.
 
 ## Running the app
 

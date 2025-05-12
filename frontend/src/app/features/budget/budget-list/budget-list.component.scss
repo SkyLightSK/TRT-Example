@@ -26,9 +26,10 @@ $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
   
   h1 {
-    font-size: 24px;
+    font-size: 28px;
     color: $secondary-color;
     margin: 0;
+    font-weight: 500;
   }
   
   .controls {
@@ -54,105 +55,68 @@ $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       background-color: white;
     }
   }
-  
-  .refresh-btn, .add-btn {
-    background-color: $primary-color;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 15px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    
-    &:hover {
-      background-color: color.adjust($primary-color, $lightness: -10%);
-    }
-  }
-
-  .refresh-btn {
-    background-color: #4a86e8;
-    margin-left: auto;
-    margin-right: 10px;
-  }
 }
 
 // Budget Summary
 .budget-summary {
   margin-bottom: 30px;
   
-  .card {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: $box-shadow;
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 10px;
+  }
+  
+  .summary-item {
+    display: flex;
+    flex-direction: column;
     
-    h2 {
-      font-size: 18px;
-      margin-top: 0;
-      margin-bottom: 15px;
+    .label {
+      font-size: 14px;
+      color: $dark-gray;
+      margin-bottom: 5px;
+    }
+    
+    .value {
+      font-size: 24px;
+      font-weight: 500;
       color: $secondary-color;
-    }
-    
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    
-    .summary-item {
-      display: flex;
-      flex-direction: column;
-      
-      .label {
-        font-size: 14px;
-        color: $dark-gray;
-        margin-bottom: 5px;
-      }
-      
-      .value {
-        font-size: 24px;
-        font-weight: 500;
-        color: $secondary-color;
-      }
     }
   }
 }
 
-// Tabs
-.tabs {
+// Loading and Empty States
+.loading-container {
   display: flex;
-  margin-bottom: 20px;
-  border-bottom: 1px solid $medium-gray;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: $dark-gray;
   
-  button {
-    background: none;
-    border: none;
-    padding: 12px 20px;
+  span {
+    margin-top: 15px;
+  }
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: $dark-gray;
+  background-color: $light-gray;
+  border-radius: 8px;
+  margin: 20px 0;
+  
+  p {
+    margin-bottom: 20px;
     font-size: 16px;
-    cursor: pointer;
-    color: $dark-gray;
-    position: relative;
-    
-    &.active {
-      color: $primary-color;
-      font-weight: 500;
-      
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-color: $primary-color;
-      }
-    }
-    
-    &:hover:not(.active) {
-      color: $secondary-color;
-    }
+  }
+
+  .info {
+    font-style: italic;
+    color: $primary-color;
+    font-size: 14px;
   }
 }
 
@@ -196,43 +160,6 @@ $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     justify-content: flex-end;
     gap: 8px;
   }
-  
-  button {
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    
-    &.edit-btn {
-      background-color: $primary-color;
-      color: white;
-      
-      &:hover {
-        background-color: color.adjust($primary-color, $lightness: -10%);
-      }
-    }
-    
-    &.delete-btn {
-      background-color: $danger-color;
-      color: white;
-      
-      &:hover {
-        background-color: color.adjust($danger-color, $lightness: -10%);
-      }
-    }
-    
-    &.view-btn {
-      background-color: $success-color;
-      color: white;
-      
-      &:hover {
-        background-color: color.adjust($success-color, $lightness: -10%);
-      }
-    }
-  }
 }
 
 // Budget Items Grid
@@ -242,26 +169,54 @@ $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 }
 
-// Loading and Empty States
-.loading, .empty-state {
-  padding: 40px;
-  text-align: center;
-  color: $dark-gray;
-}
-
-.empty-state {
-  button {
-    background-color: $primary-color;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 15px;
-    margin-top: 15px;
-    cursor: pointer;
+// Selected Budget View
+.selected-budget-view {
+  margin-top: 20px;
+  
+  .heading-with-actions {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
     
-    &:hover {
-      background-color: color.adjust($primary-color, $lightness: -10%);
+    h2 {
+      margin: 0 0 0 10px;
+      font-size: 24px;
+      color: $secondary-color;
     }
+  }
+  
+  .budget-card {
+    margin-bottom: 30px;
+  }
+  
+  .budget-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+    
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      
+      .label {
+        font-size: 14px;
+        color: $dark-gray;
+        margin-bottom: 5px;
+      }
+      
+      .value {
+        font-size: 18px;
+        color: $secondary-color;
+      }
+    }
+  }
+  
+  h3 {
+    font-size: 20px;
+    color: $secondary-color;
+    margin: 30px 0 20px;
+    font-weight: 500;
   }
 }
 
@@ -354,36 +309,6 @@ $box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       justify-content: flex-end;
       gap: 10px;
       margin-top: 20px;
-      
-      button {
-        padding: 10px 15px;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
-        
-        &:first-child {
-          background-color: $light-gray;
-          color: $secondary-color;
-          
-          &:hover {
-            background-color: color.adjust($light-gray, $lightness: -5%);
-          }
-        }
-        
-        &:last-child {
-          background-color: $primary-color;
-          color: white;
-          
-          &:hover {
-            background-color: color.adjust($primary-color, $lightness: -10%);
-          }
-          
-          &:disabled {
-            background-color: color.adjust($primary-color, $lightness: 20%);
-            cursor: not-allowed;
-          }
-        }
-      }
     }
   }
 } 

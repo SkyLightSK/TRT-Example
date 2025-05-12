@@ -2,8 +2,13 @@
   <div class="dashboard-header">
     <h1>Terminals Inventory</h1>
     <div class="actions">
+      <button class="btn btn-refresh" (click)="loadDevices()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
       <button class="btn btn-add" (click)="openDeviceForm()">
-        <i class="fas fa-plus"></i> Add Terminal
+        <mat-icon>add</mat-icon>
+        Add Terminal
       </button>
     </div>
   </div>
@@ -12,14 +17,9 @@
     <div class="search-section">
       <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Filter Devices</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Filter by any field" #input>
+        <input matInput (keyup)="applyFilter($event)" #input>
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
-    </div>
-    <div class="action-buttons">
-      <button class="btn btn-refresh" (click)="loadDevices()">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
     </div>
   </div>
 

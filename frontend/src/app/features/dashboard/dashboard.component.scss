@@ -424,4 +424,26 @@
     background: #28a745; 
     color: white; 
   }
+}
+
+.page-container {
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr;
+    }
+
+    // Add borders to all direct children (widgets)
+    > * {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      background-color: white;
+      overflow: hidden;
+    }
+  }
 } 

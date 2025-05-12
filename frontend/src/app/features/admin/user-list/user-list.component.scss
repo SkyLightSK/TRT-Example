@@ -10,6 +10,11 @@
     h1 {
       margin: 0;
     }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
   }
   
   .filter-field {
@@ -34,27 +39,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-    
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      color: white;
-      
-      &.active {
-        background-color: #4CAF50;
-      }
-      
-      &.inactive {
-        background-color: #9E9E9E;
-      }
-      
-      &.pending {
-        background-color: #FF9800;
-      }
     }
     
     .loading-shade {
@@ -169,28 +153,6 @@
       border-radius: 4px;
       font-size: 0.85rem;
       font-weight: 500;
-    }
-  }
-
-  .status-badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 500;
-
-    &.active {
-      background: #e1f7e1;
-      color: #27ae60;
-    }
-
-    &.inactive {
-      background: #fde2e2;
-      color: #e74c3c;
-    }
-
-    &.pending {
-      background: #fff3e0;
-      color: #f39c12;
     }
   }
 

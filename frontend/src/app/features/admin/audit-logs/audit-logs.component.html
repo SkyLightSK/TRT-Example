@@ -8,6 +8,9 @@
   <div class="admin-header">
     <h1>Audit Logs</h1>
     <div class="header-actions">
+      <button mat-raised-button color="accent" (click)="loadAuditLogs()" matTooltip="Refresh audit logs">
+        <mat-icon>refresh</mat-icon> Refresh
+      </button>
       <button mat-raised-button color="primary" (click)="exportLogs()" matTooltip="Export logs to file">
         <mat-icon>file_download</mat-icon> Export
       </button>

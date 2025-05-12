@@ -57,6 +57,7 @@ export class BudgetListComponent implements OnInit {
   loadingItems = false;
   showModal = false;
   editingBudget: Budget | null = null;
+  activeTab: 'budgets' | 'items' = 'budgets';
   
   // Form
   budgetForm: FormGroup;
@@ -288,6 +289,20 @@ export class BudgetListComponent implements OnInit {
           console.error('Error creating budget:', error);
         }
       });
+    }
+  }
+
+  refreshData(): void {
+    if (this.selectedBudget) {
+      // If a budget is selected, refresh its items
+      this.loadBudgetWithItems(this.selectedBudget.id);
+    } else if (this.activeTab === 'budgets') {
+      this.loadBudgets();
+    } else if (this.activeTab === 'items') {
+      this.loadBudgetItems();
+    } else {
+      // Default fallback
+      this.loadBudgets();
     }
   }
 } 

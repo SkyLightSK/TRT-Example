@@ -8,6 +8,9 @@
           <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
         </select>
       </div>
+      <button mat-raised-button color="accent" (click)="refreshData()">
+        <mat-icon>refresh</mat-icon> Refresh Data
+      </button>
       <button mat-raised-button color="primary" (click)="onAdd()">
         <mat-icon>add</mat-icon> Add Budget
       </button>

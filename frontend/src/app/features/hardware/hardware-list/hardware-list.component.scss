@@ -133,7 +133,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     
     h1 {
       margin: 0;
@@ -156,6 +156,11 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
     }
   }
   

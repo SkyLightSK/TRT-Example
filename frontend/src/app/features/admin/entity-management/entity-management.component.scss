@@ -10,6 +10,42 @@
     h1 {
       margin: 0;
     }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+  }
+  
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+    flex-wrap: wrap;
+    
+    .breadcrumb-item {
+      padding: 4px 8px;
+      border-radius: 4px;
+      
+      &.clickable {
+        cursor: pointer;
+        color: #3f51b5;
+        
+        &:hover {
+          background-color: rgba(63, 81, 181, 0.1);
+        }
+      }
+      
+      &.active {
+        font-weight: 500;
+      }
+    }
+    
+    .breadcrumb-separator {
+      margin: 0 4px;
+      color: #757575;
+    }
   }
   
   .filter-field {
@@ -32,18 +68,16 @@
     .clickable {
       cursor: pointer;
       color: #3f51b5;
-      display: flex;
-      align-items: center;
       
       &:hover {
         text-decoration: underline;
       }
       
       .small-icon {
-        font-size: 18px;
-        height: 18px;
-        width: 18px;
-        margin-left: 5px;
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        vertical-align: middle;
       }
     }
     

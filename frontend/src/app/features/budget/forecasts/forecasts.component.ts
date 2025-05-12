@@ -64,4 +64,8 @@ export class ForecastsComponent implements OnInit {
       }
     });
   }
+
+  loadForecasts(): void {
+    this.loadData();
+  }
 } 

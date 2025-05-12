@@ -46,6 +46,12 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Budget Forecasts</mat-card-title>
+      <div class="header-actions">
+        <button mat-raised-button color="accent" (click)="loadForecasts()">
+          <mat-icon>refresh</mat-icon>
+          Refresh Data
+        </button>
+      </div>
     </mat-card-header>
     <mat-card-content>
       <div class="forecast-content">

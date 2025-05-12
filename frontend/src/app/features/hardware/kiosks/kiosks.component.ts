@@ -168,4 +168,8 @@ export class KiosksComponent implements OnInit, AfterViewInit {
       this.dataSource.paginator.firstPage();
     }
   }
+
+  loadDevices(): void {
+    this.loadKiosks();
+  }
 } 

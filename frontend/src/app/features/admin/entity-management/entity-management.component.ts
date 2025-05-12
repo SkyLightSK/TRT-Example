@@ -14,15 +14,25 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../../core/services/api.service';
+import { EntityFormDialogComponent } from './entity-form-dialog.component';
+import { catchError, finalize, of } from 'rxjs';
 
 interface Entity {
-  id: string;
+  id: number;
   name: string;
   description: string;
   code: string;
-  parentId: string | null;
-  parentName?: string;
-  childCount: number;
+  parentId: number | null;
+  parent?: Entity;
+  children?: Entity[];
+  childCount?: number;
+}
+
+interface EntityDto {
+  name: string;
+  description: string;
+  code: string;
+  parentId: number | null;
 }
 
 @Component({
@@ -53,6 +63,9 @@ export class EntityManagementComponent implements OnInit {
   dataSource = new MatTableDataSource<Entity>([]);
   isLoading = false;
   filterValue = '';
+  entities: Entity[] = [];
+  currentParentId: number | null = null;
+  breadcrumbs: Entity[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -72,66 +85,66 @@ export class EntityManagementComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
-  loadEntities(): void {
+  loadEntities(parentId: number | null = null): void {
     this.isLoading = true;
-    // TODO: Replace with actual API call when available
-    // For now, using mock data
-    setTimeout(() => {
-      this.dataSource.data = [
-        {
-          id: '1',
-          name: 'Aaron, James D Jr',
-          description: 'Owner/Operator for North Region',
-          code: 'NO-001',
-          parentId: null,
-          childCount: 2
-        },
-        {
-          id: '2',
-          name: 'Smith, Sarah K',
-          description: 'Owner/Operator for East Region',
-          code: 'EA-001',
-          parentId: null,
-          childCount: 1
-        },
-        {
-          id: '3',
-          name: 'Johnson, Michael T',
-          description: 'Owner/Operator for West Region',
-          code: 'WE-001',
-          parentId: null,
-          childCount: 1
-        },
-        {
-          id: '4',
-          name: 'Store #1234 - North Oak',
-          description: 'North Oak Street Location',
-          code: 'NO-1234',
-          parentId: '1',
-          parentName: 'Aaron, James D Jr',
-          childCount: 0
-        },
-        {
-          id: '5',
-          name: 'Store #2345 - East Main',
-          description: 'East Main Street Location',
-          code: 'EA-2345',
-          parentId: '2',
-          parentName: 'Smith, Sarah K',
-          childCount: 0
-        },
-        {
-          id: '6',
-          name: 'Store #3456 - West Lake',
-          description: 'West Lake Avenue Location',
-          code: 'WE-3456',
-          parentId: '3',
-          parentName: 'Johnson, Michael T',
-          childCount: 0
+    this.currentParentId = parentId;
+    
+    this.apiService.get<Entity[]>('/entities')
+      .pipe(
+        catchError(error => {
+          console.error('Error loading entities:', error);
+          this.snackBar.open('Failed to load entities. Please try again.', 'Close', { duration: 5000 });
+          return of([]);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((entities: Entity[]) => {
+        this.entities = entities;
+        
+        // Process entities to add child count and parent name
+        const processedEntities = entities.map(entity => {
+          const childCount = entities.filter(e => e.parentId === entity.id).length;
+          const parent = entities.find(e => e.id === entity.parentId);
+          
+          return {
+            ...entity,
+            childCount,
+            parent
+          };
+        });
+        
+        // Filter by parent ID if specified
+        if (parentId !== null) {
+          this.dataSource.data = processedEntities.filter(entity => entity.parentId === parentId);
+          
+          // Update breadcrumbs
+          this.updateBreadcrumbs(parentId, entities);
+        } else {
+          // Show top-level entities
+          this.dataSource.data = processedEntities.filter(entity => entity.parentId === null);
+          this.breadcrumbs = [];
         }
-      ];
-      this.isLoading = false;
-    }, 500);
+      });
+  }
+
+  updateBreadcrumbs(parentId: number, entities: Entity[]): void {
+    this.breadcrumbs = [];
+    let currentEntity = entities.find(e => e.id === parentId);
+    
+    while (currentEntity) {
+      this.breadcrumbs.unshift(currentEntity);
+      currentEntity = entities.find(e => e.id === currentEntity?.parentId);
+    }
+  }
+
+  navigateToBreadcrumb(entity: Entity | null): void {
+    if (entity === null) {
+      this.loadEntities();
+    } else {
+      this.loadEntities(entity.id);
+    }
   }
 
   applyFilter(event: Event): void {
@@ -145,25 +158,119 @@ export class EntityManagementComponent implements OnInit {
   }
 
   openEntityDialog(entity?: Entity): void {
-    // TODO: Implement entity form dialog
-    console.log('Open entity dialog:', entity || 'new entity');
-    this.snackBar.open(entity ? 'Edit entity dialog opened' : 'Add entity dialog opened', 'Close', { duration: 3000 });
+    // Filter out the current entity and its children to prevent circular references
+    let availableParents = this.entities;
+    
+    if (entity) {
+      const childIds = this.getChildIds(entity);
+      availableParents = this.entities.filter(e => 
+        e.id !== entity.id && !childIds.includes(e.id)
+      );
+    }
+    
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '500px',
+      data: {
+        entity: entity,
+        entities: availableParents
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (entity) {
+          this.updateEntity(entity.id, result);
+        } else {
+          this.createEntity(result);
+        }
+      }
+    });
+  }
+
+  getChildIds(entity: Entity): number[] {
+    const childIds: number[] = [];
+    const getChildren = (id: number) => {
+      const children = this.entities.filter(e => e.parentId === id);
+      children.forEach(child => {
+        childIds.push(child.id);
+        getChildren(child.id);
+      });
+    };
+    
+    getChildren(entity.id);
+    return childIds;
+  }
+
+  createEntity(entityData: EntityDto): void {
+    this.isLoading = true;
+    this.apiService.post<Entity>('/entities', entityData)
+      .pipe(
+        catchError(error => {
+          console.error('Error creating entity:', error);
+          this.snackBar.open('Failed to create entity. Please try again.', 'Close', { duration: 5000 });
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((result: Entity | null) => {
+        if (result) {
+          this.snackBar.open('Entity created successfully', 'Close', { duration: 3000 });
+          this.loadEntities(this.currentParentId);
+        }
+      });
+  }
+
+  updateEntity(id: number, entityData: EntityDto): void {
+    this.isLoading = true;
+    this.apiService.patch<Entity>(`/entities/${id}`, entityData)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating entity:', error);
+          this.snackBar.open('Failed to update entity. Please try again.', 'Close', { duration: 5000 });
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((result: Entity | null) => {
+        if (result) {
+          this.snackBar.open('Entity updated successfully', 'Close', { duration: 3000 });
+          this.loadEntities(this.currentParentId);
+        }
+      });
   }
 
   viewChildren(entity: Entity): void {
-    // TODO: Implement viewing children entities
-    console.log('View children of entity:', entity);
-    this.snackBar.open(`Viewing children of ${entity.name}`, 'Close', { duration: 3000 });
+    this.loadEntities(entity.id);
   }
 
   confirmDelete(entity: Entity): void {
     if (confirm(`Are you sure you want to delete entity ${entity.name}?`)) {
-      // TODO: Implement entity deletion
-      console.log('Delete entity:', entity);
-      this.snackBar.open(`Entity ${entity.name} deleted successfully`, 'Close', { duration: 3000 });
-      
-      // Mock deletion from the list
-      this.dataSource.data = this.dataSource.data.filter(e => e.id !== entity.id);
+      this.deleteEntity(entity.id);
     }
+  }
+
+  deleteEntity(id: number): void {
+    this.isLoading = true;
+    this.apiService.delete<void>(`/entities/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting entity:', error);
+          this.snackBar.open('Failed to delete entity. Please try again.', 'Close', { duration: 5000 });
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe(result => {
+        this.snackBar.open('Entity deleted successfully', 'Close', { duration: 3000 });
+        // Remove from local data while waiting for refresh
+        this.dataSource.data = this.dataSource.data.filter(e => e.id !== id);
+        this.loadEntities(this.currentParentId);
+      });
   }
 } 

@@ -168,4 +168,8 @@ export class TerminalsComponent implements OnInit, AfterViewInit {
       this.dataSource.paginator.firstPage();
     }
   }
+
+  loadDevices(): void {
+    this.loadTerminals();
+  }
 } 

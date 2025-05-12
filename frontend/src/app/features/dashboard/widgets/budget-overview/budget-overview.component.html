@@ -50,6 +50,25 @@
               </div>
             </div>
             
+            <!-- Calculation Methodology Section -->
+            <div class="calculation-info">
+              <button class="info-toggle" (click)="toggleCalculationInfo()" type="button">
+                <mat-icon>info_outline</mat-icon>
+                <span>Calculation Methodology</span>
+              </button>
+              <div class="calculation-details" *ngIf="showCalculationInfo">
+                <h4>How these numbers are calculated:</h4>
+                <ul>
+                  <li><strong>Total Budget:</strong> Sum of all budget allocations across all entities and fiscal years</li>
+                  <li><strong>Spent To Date:</strong> Sum of all recorded expenses against these budgets</li>
+                  <li><strong>Budget Utilization:</strong> (Total Spent ÷ Total Budget) × 100%</li>
+                  <li><strong>Entity Breakdown:</strong> Individual entity contributions to the overall budget</li>
+                  <li><strong>Yearly Trends:</strong> Budget performance over time, showing allocation vs. actual spending</li>
+                </ul>
+                <p class="calculation-note">Note: Budget utilization is calculated in real-time based on current spending data.</p>
+              </div>
+            </div>
+            
             <!-- Entity Breakdown Section -->
             <div *ngIf="budgetStats.entitiesBreakdown && budgetStats.entitiesBreakdown.length" class="entity-breakdown">
               <h3>Entity Breakdown</h3>

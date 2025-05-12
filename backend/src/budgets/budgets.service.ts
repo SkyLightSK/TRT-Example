@@ -130,6 +130,34 @@ export class BudgetsService {
     return budgetItem;
   }
 
+  /**
+   * Compiles comprehensive budget statistics across entities
+   * 
+   * This method aggregates budget data across the system to provide:
+   * - Overall budget metrics (total allocated, spent, utilization)
+   * - Breakdown by entity
+   * - Yearly trends
+   * - Category allocations
+   * 
+   * Calculation methodology:
+   * 1. Data collection: Fetches budgets, optionally filtered by entity
+   * 2. Yearly aggregation: Groups budgets by fiscal year
+   * 3. Trend calculation: For each year, calculates:
+   *    - Total budget: Sum of all budget amounts for that year
+   *    - Spent to date: Based on actual transactions or simulated based on year age
+   *    - Utilization: (Spent / Total budget) * 100
+   * 4. Entity breakdown: For each entity, calculates:
+   *    - Total budget: Sum of all budgets for that entity
+   *    - Spent amount: Based on actual transactions or simulated
+   *    - Utilization percentage: (Spent / Total budget) * 100
+   * 5. Overall metrics:
+   *    - Total allocated: Sum of all budgets across all years
+   *    - Total spent: Sum of all spent amounts
+   *    - Overall utilization: (Total spent / Total allocated) * 100
+   * 
+   * @param entityId Optional ID to filter statistics for a specific entity
+   * @returns Compiled budget statistics
+   */
   async getBudgetStatistics(entityId?: number): Promise<BudgetStatistics> {
     // Step 1: Get all budgets, optionally filtered by entity
     let budgetsQuery = this.budgetsRepository.createQueryBuilder('budget')
@@ -186,6 +214,7 @@ export class BudgetsService {
     const yearlyTrends: YearlyBudgetTrend[] = [];
     
     for (const [year, yearBudgets] of budgetsByYear.entries()) {
+      // Calculate total budget for this year (sum of all budgets)
       const totalBudget = yearBudgets.reduce((sum, budget) => sum + Number(budget.totalAmount), 0);
       
       // For spent amount, we'll calculate based on budget items or use a simulation
@@ -193,12 +222,13 @@ export class BudgetsService {
       const budgetItems = yearBudgets.flatMap(budget => budget.items || []);
       
       // For this example, we'll simulate spent amounts as 30-80% of total budget
-      // with higher percentages for older years
+      // with higher percentages for older years (assuming older budgets have more complete spending)
       const currentYear = new Date().getFullYear();
       const yearDiff = currentYear - year;
       const spentRatio = Math.min(0.3 + (yearDiff * 0.15), 0.95);
       const spentToDate = totalBudget * spentRatio;
       
+      // Calculate utilization percentage
       const utilization = totalBudget > 0 ? (spentToDate / totalBudget) * 100 : 0;
       
       yearlyTrends.push({
@@ -289,10 +319,27 @@ export class BudgetsService {
     };
   }
   
+  /**
+   * Calculates budget breakdown by category
+   * 
+   * This method analyzes budget items and groups them by category to show:
+   * - Amount allocated per category
+   * - Percentage of total budget per category
+   * 
+   * Calculation methodology:
+   * 1. Extract category from each budget item's description (before colon)
+   * 2. Group items by category and sum amounts
+   * 3. Calculate percentage of total for each category
+   * 4. Sort categories by amount (highest first)
+   * 
+   * @param items Collection of budget items to analyze
+   * @returns Array of category breakdowns with amounts and percentages
+   */
   private calculateCategoryBreakdown(items: BudgetItem[]): CategoryBreakdown[] {
     const categoryMap = new Map<string, number>();
     let totalAmount = 0;
     
+    // Group items by category and sum amounts
     items.forEach(item => {
       // Extract category from description or use the full description
       const category = item.description.split(':')[0].trim();
@@ -302,6 +349,7 @@ export class BudgetsService {
       totalAmount += amount;
     });
     
+    // Create category breakdown with percentages
     const categories: CategoryBreakdown[] = [];
     
     categoryMap.forEach((amount, name) => {
@@ -312,7 +360,7 @@ export class BudgetsService {
       });
     });
     
-    // Sort by amount descending
+    // Sort by amount descending (highest first)
     return categories.sort((a, b) => b.amount - a.amount);
   }
   
@@ -332,7 +380,27 @@ export class BudgetsService {
     };
   }
 
-  // Add a new method to calculate entity breakdown
+  /**
+   * Calculates budget statistics breakdown by entity
+   * 
+   * This method processes a collection of budgets and generates
+   * per-entity statistics showing each entity's:
+   * - Total budget allocation
+   * - Spent amount
+   * - Utilization percentage
+   * 
+   * Calculation methodology:
+   * 1. Group budgets by entity
+   * 2. For each entity:
+   *    - Sum all budget amounts to get total budget
+   *    - Calculate or simulate spent amount
+   *    - Calculate utilization percentage
+   * 3. Sort entities by budget amount (highest first)
+   * 
+   * @param budgets Collection of budgets to analyze
+   * @param entityMap Map of entity IDs to entity data for quick lookup
+   * @returns Array of entity budget breakdowns
+   */
   private async calculateEntityBreakdown(budgets: Budget[], entityMap: Map<number, { id: number, name: string }>): Promise<EntityBreakdown[]> {
     const breakdownMap = new Map<number, EntityBreakdown>();
     
@@ -353,6 +421,7 @@ export class BudgetsService {
             utilization: 0
           };
           
+          // Accumulate budget amounts for this entity
           entityData.totalBudget += Number(budget.totalAmount) || 0;
           breakdownMap.set(entityId, entityData);
         }
@@ -365,6 +434,7 @@ export class BudgetsService {
     // Calculate spent amounts (simulated)
     for (const [entityId, entityData] of breakdownMap.entries()) {
       // Simulate spent amount as 30-70% of total budget
+      // In a real application, this would be calculated from actual transactions
       const spentRatio = Math.random() * 0.4 + 0.3; // Between 30% and 70%
       entityData.spentToDate = entityData.totalBudget * spentRatio;
       entityData.utilization = entityData.totalBudget > 0 
@@ -372,7 +442,7 @@ export class BudgetsService {
         : 0;
     }
     
-    // Convert to array and sort by budget amount
+    // Convert to array and sort by budget amount (highest first)
     const entityBreakdown = Array.from(breakdownMap.values());
     entityBreakdown.sort((a, b) => b.totalBudget - a.totalBudget);
     

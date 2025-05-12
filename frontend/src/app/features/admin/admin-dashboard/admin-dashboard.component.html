@@ -1,10 +1,10 @@
-<div class="admin-dashboard-container">
-  <div class="admin-dashboard-header">
+<div class="page-container">
+  <div class="dashboard-header">
     <h1>Admin Dashboard</h1>
     <p class="subtitle">Manage system settings, users, and entities</p>
   </div>
 
-  <div class="admin-modules-grid">
+  <div class="grid grid-3">
     <mat-card class="admin-module-card" *ngFor="let feature of features" 
       [style.border-top]="'4px solid ' + feature.color" 
       [class.disabled]="feature.disabled"
@@ -20,9 +20,9 @@
         </mat-card-subtitle>
       </mat-card-header>
       <mat-card-actions align="end">
-        <button mat-button [disabled]="feature.disabled" [routerLink]="!feature.disabled ? feature.route : null">
-          <span *ngIf="!feature.disabled">OPEN <mat-icon>arrow_forward</mat-icon></span>
-          <span *ngIf="feature.disabled">DISABLED</span>
+        <button class="btn btn-secondary" [disabled]="feature.disabled" [routerLink]="!feature.disabled ? feature.route : null">
+          <span *ngIf="!feature.disabled">Open <mat-icon>arrow_forward</mat-icon></span>
+          <span *ngIf="feature.disabled">Disabled</span>
         </button>
       </mat-card-actions>
     </mat-card>

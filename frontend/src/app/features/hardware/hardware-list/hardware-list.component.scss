@@ -179,6 +179,7 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    /* IMPORTANT: Keep z-index lower than sidebar (which is 10) to prevent header overflow */
     z-index: 1;
     
     table {
@@ -187,6 +188,7 @@
       ::ng-deep .mat-header-row {
         background-color: #fafafa;
         position: relative;
+        /* IMPORTANT: Keep z-index lower than sidebar (which is 10) to prevent header overflow */
         z-index: 1;
         
         .mat-header-cell {
@@ -316,12 +318,14 @@
   // Fix for Angular Material sticky headers
   .mat-table {
     position: relative;
-    z-index: auto !important;
+    /* IMPORTANT: Do not use z-index: auto here as it causes header to overlap sidebar */
+    z-index: 1
   }
 
   .mat-table-sticky {
     position: sticky !important;
-    z-index: 1 !important;
+    /* IMPORTANT: Keep z-index lower than sidebar (which is 10) to prevent header overflow */
+    z-index: 1;
   }
   
   // Status style in selects and forms

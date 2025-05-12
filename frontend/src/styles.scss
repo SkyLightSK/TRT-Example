@@ -180,6 +180,8 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
+  /* IMPORTANT: Keep z-index lower than sidebar (which is 10) to prevent header overflow */
+  z-index: 1;
 }
 
 .data-table {
@@ -198,6 +200,7 @@ body {
     background-color: #f8f9fa;
     position: sticky;
     top: 0;
+    /* IMPORTANT: Keep z-index lower than sidebar (which is 10) to prevent header overflow */
     z-index: 1;
   }
   

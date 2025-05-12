@@ -26,15 +26,16 @@ export class UpcomingEolComponent {
 
   getDeviceStatusLabel(daysUntilEol: number): string {
     if (daysUntilEol <= 30) {
-      return 'Retirement Imminent';
+      return 'Warranty Expires Soon';
     } else if (daysUntilEol <= 90) {
-      return 'Approaching Retirement';
+      return 'Warranty Expiration Approaching';
     } else {
-      return 'Active';
+      return 'Warranty Active';
     }
   }
 
   formatDate(dateString: string): string {
+    if (dateString === 'N/A') return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',

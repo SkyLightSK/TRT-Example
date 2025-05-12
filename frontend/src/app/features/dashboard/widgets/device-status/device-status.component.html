@@ -8,7 +8,7 @@
       <div *ngIf="deviceStatus" class="status-grid">
         <div class="status-item">
           <div class="status-count">{{deviceStatus.Active}}</div>
-          <div class="status-label">Active</div>
+          <div class="status-label">{{DeviceStatus.Active}}</div>
           <div class="status-bar">
             <div class="status-bar-fill status-good" [style.width.%]="getPercentage(deviceStatus.Active)"></div>
           </div>
@@ -16,7 +16,7 @@
         
         <div class="status-item">
           <div class="status-count">{{deviceStatus.Required}}</div>
-          <div class="status-label">Required</div>
+          <div class="status-label">{{DeviceStatus.Required}}</div>
           <div class="status-bar">
             <div class="status-bar-fill status-warning" [style.width.%]="getPercentage(deviceStatus.Required)"></div>
           </div>
@@ -24,7 +24,7 @@
         
         <div class="status-item">
           <div class="status-count">{{deviceStatus.Retired}}</div>
-          <div class="status-label">Retired</div>
+          <div class="status-label">{{DeviceStatus.Retired}}</div>
           <div class="status-bar">
             <div class="status-bar-fill status-inactive" [style.width.%]="getPercentage(deviceStatus.Retired)"></div>
           </div>
@@ -45,6 +45,6 @@
   </div>
   
   <div class="card-footer">
-    <a routerLink="/devices" class="view-all-link">View all devices</a>
+    <a routerLink="/hardware" class="view-all-link">View all devices</a>
   </div>
 </div>

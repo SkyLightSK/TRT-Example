@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
-import { DeviceService, DeviceStatusSummary } from '../../core/services/device.service';
+import { DeviceService, DeviceStatusSummary, DeviceType } from '../../core/services/device.service';
 import { BudgetService } from '../../core/services/budget.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { BudgetOverviewModule } from './widgets/budget-overview/budget-overview.module';
@@ -144,21 +144,32 @@ export class DashboardComponent implements OnInit {
 
   private loadUpcomingEolDevices(): void {
     this.loading.upcomingEol = true;
-    this.deviceService.getUpcomingEndOfLifeDevices().subscribe({
+    this.deviceService.getUpcomingWarrantyExpirationDevices().subscribe({
       next: (devices) => {
         // Map the devices to the format expected by the upcoming-eol component
         this.upcomingEolDevices = devices.map(device => {
-          const eolDate = new Date(device.endOfLife);
+          if (!device.warrantyExpiration) {
+            return {
+              id: device.id.toString(),
+              name: device.name,
+              eolDate: 'N/A',
+              daysUntilEol: 0,
+              model: device.model,
+              type: device.deviceType
+            };
+          }
+          
+          const eolDate = new Date(device.warrantyExpiration);
           const today = new Date();
           const daysUntilEol = Math.floor((eolDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
           
           return {
             id: device.id.toString(),
-            name: `${device.manufacturer} ${device.model}`,
-            eolDate: device.endOfLife.toString(),
+            name: device.name,
+            eolDate: device.warrantyExpiration.toString(),
             daysUntilEol: daysUntilEol,
             model: device.model,
-            type: device.type
+            type: device.deviceType
           };
         });
         this.loading.upcomingEol = false;

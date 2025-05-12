@@ -1,16 +1,17 @@
+import { DeviceType, DeviceStatus } from '../services/device.service';
+
 export interface Device {
-  id: string;
+  id: number;
   name: string;
-  type: string;
-  model: string;
   serialNumber: string;
-  status: 'Active' | 'Required' | 'Retired';
-  lastCheckedIn: string;
-  installationDate: string;
-  eolDate: string;
-  location: string;
-  assignedTo?: string;
-  notes?: string;
+  model: string;
+  deviceType: DeviceType;
+  deviceStatus: DeviceStatus;
+  purchaseDate?: Date | string;
+  warrantyExpiration?: Date | string;
+  entityId?: number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface DeviceStatusSummary {

@@ -2,8 +2,13 @@
   <div class="dashboard-header">
     <h1>Entity Management</h1>
     <div class="actions">
+      <button class="btn btn-refresh" (click)="loadEntities(currentParentId)">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
       <button class="btn btn-add" (click)="openEntityDialog()">
-        <i class="fas fa-plus"></i> Add Entity
+        <mat-icon>add</mat-icon>
+        Add Entity
       </button>
     </div>
   </div>
@@ -20,7 +25,7 @@
     </ng-container>
   </div>
 
-  <!-- Toolbar with filter and refresh -->
+  <!-- Toolbar with filter -->
   <div class="toolbar-container">
     <div class="search-section">
       <mat-form-field appearance="outline" class="filter-field">
@@ -28,11 +33,6 @@
         <input matInput (keyup)="applyFilter($event)" #input>
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
-    </div>
-    <div class="action-buttons">
-      <button class="btn btn-refresh" (click)="loadEntities(currentParentId)">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
     </div>
   </div>
 

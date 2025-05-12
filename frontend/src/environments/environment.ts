@@ -4,7 +4,7 @@
 // The standard way to handle environment config in Angular
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3001/api',
+  apiUrl: 'http://localhost:3000/api',
   authApiPath: '/auth',
   deviceApiPath: '/devices',
   budgetApiPath: '/budgets',

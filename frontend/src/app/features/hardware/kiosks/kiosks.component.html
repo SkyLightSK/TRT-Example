@@ -2,8 +2,13 @@
   <div class="dashboard-header">
     <h1>Kiosks Inventory</h1>
     <div class="actions">
+      <button class="btn btn-refresh" (click)="loadDevices()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
       <button class="btn btn-add" (click)="openDeviceForm()">
-        <i class="fas fa-plus"></i> Add Kiosk
+        <mat-icon>add</mat-icon>
+        Add Kiosk
       </button>
     </div>
   </div>
@@ -15,11 +20,6 @@
         <input matInput (keyup)="applyFilter($event)" #input>
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
-    </div>
-    <div class="action-buttons">
-      <button class="btn btn-refresh" (click)="loadDevices()">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
     </div>
   </div>
 

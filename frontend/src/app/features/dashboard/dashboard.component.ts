@@ -9,7 +9,7 @@ import { forkJoin } from 'rxjs';
 import { DeviceService, DeviceStatusSummary } from '../../core/services/device.service';
 import { BudgetService } from '../../core/services/budget.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { BudgetOverviewComponent } from './widgets/budget-overview/budget-overview.component';
+import { BudgetOverviewModule } from './widgets/budget-overview/budget-overview.module';
 import { DeviceStatusComponent } from './widgets/device-status/device-status.component';
 import { RecentNotificationsComponent } from './widgets/recent-notifications/recent-notifications.component';
 import { UpcomingEolComponent } from './widgets/upcoming-eol/upcoming-eol.component';
@@ -36,7 +36,7 @@ interface UpcomingEOLDevice {
     MatIconModule,
     MatButtonModule,
     RouterModule,
-    BudgetOverviewComponent,
+    BudgetOverviewModule,
     DeviceStatusComponent,
     RecentNotificationsComponent,
     UpcomingEolComponent
@@ -88,10 +88,13 @@ export class DashboardComponent implements OnInit {
 
   private loadBudgetStats(): void {
     this.loading.budget = true;
-    this.budgetService.getBudgetStatistics().subscribe({
+    
+    // Get budget statistics for entity ID 1
+    this.budgetService.getBudgetStatistics(1).subscribe({
       next: (stats) => {
         this.budgetStats = stats;
         this.loading.budget = false;
+        console.log('Budget statistics loaded successfully:', stats);
       },
       error: (err) => {
         console.error('Error loading budget statistics', err);

@@ -397,3 +397,69 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.entity-breakdown {
+  margin-bottom: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+  
+  h3 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .entity-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+  
+  .entity-item {
+    margin-bottom: 12px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .entity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      
+      .entity-name {
+        font-size: 13px;
+        font-weight: 500;
+      }
+      
+      .entity-budget {
+        font-size: 13px;
+        color: #616161;
+      }
+    }
+    
+    .entity-progress {
+      .progress-bar {
+        height: 6px;
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 3px;
+        
+        .progress-fill {
+          height: 100%;
+          background-color: #2196f3;
+          transition: width 0.3s ease;
+        }
+      }
+      
+      .entity-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #757575;
+      }
+    }
+  }
+}

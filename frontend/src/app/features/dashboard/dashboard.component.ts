@@ -89,12 +89,12 @@ export class DashboardComponent implements OnInit {
   private loadBudgetStats(): void {
     this.loading.budget = true;
     
-    // Get budget statistics for entity ID 1
-    this.budgetService.getBudgetStatistics(1).subscribe({
+    // Get budget statistics for all entities (no specific entityId)
+    this.budgetService.getBudgetStatistics().subscribe({
       next: (stats) => {
         this.budgetStats = stats;
         this.loading.budget = false;
-        console.log('Budget statistics loaded successfully:', stats);
+        console.log('Budget statistics loaded successfully for all entities:', stats);
       },
       error: (err) => {
         console.error('Error loading budget statistics', err);

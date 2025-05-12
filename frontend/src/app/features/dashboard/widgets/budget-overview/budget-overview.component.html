@@ -38,6 +38,28 @@
             </div>
           </div>
           
+          <!-- Entity Breakdown Section -->
+          <div *ngIf="budgetStats.entitiesBreakdown && budgetStats.entitiesBreakdown.length" class="entity-breakdown">
+            <h3>Entity Breakdown</h3>
+            <div class="entity-list">
+              <div *ngFor="let entity of budgetStats.entitiesBreakdown" class="entity-item">
+                <div class="entity-header">
+                  <span class="entity-name">{{entity.name}}</span>
+                  <span class="entity-budget">{{formatCurrency(entity.totalBudget)}}</span>
+                </div>
+                <div class="entity-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="entity.utilization"></div>
+                  </div>
+                  <div class="entity-stats">
+                    <span>{{formatPercentage(entity.utilization)}}</span>
+                    <span>{{formatCurrency(entity.spentToDate)}} spent</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div *ngIf="budgetStats.yearlyTrends && budgetStats.yearlyTrends.length" class="yearly-trends">
             <div class="trends-header">
               <h3>Yearly Budget Trends</h3>

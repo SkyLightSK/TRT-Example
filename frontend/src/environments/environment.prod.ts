@@ -1,4 +1,4 @@
-// Create a utility function to get port from environment variables
+// Create a utility function to get port value from environment variables
 function getPortValue(): number {
   try {
     // We need to check if process is defined for browser compatibility

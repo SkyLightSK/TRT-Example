@@ -38,7 +38,8 @@
     "pg": "^8.15.6",
     "reflect-metadata": "^0.2.2",
     "swagger-ui-express": "^5.0.1",
-    "typeorm": "^0.3.23"
+    "typeorm": "^0.3.23",
+    "zod": "^3.22.4"
   },
   "jest": {
     "moduleFileExtensions": [

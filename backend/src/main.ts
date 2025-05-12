@@ -2,12 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { EnvConfig } from './config/env.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService<EnvConfig, true>);
   
-  // Enable CORS
-  app.enableCors();
+  // Enable CORS with configuration
+  app.enableCors({
+    origin: configService.get('CORS_ORIGIN'),
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+  });
   
   // Enable validation
   app.useGlobalPipes(new ValidationPipe({
@@ -17,7 +24,8 @@ async function bootstrap() {
   }));
   
   // Set global prefix
-  app.setGlobalPrefix('api');
+  const apiPrefix = configService.get('API_PREFIX');
+  app.setGlobalPrefix(apiPrefix);
   
   // Swagger setup
   const config = new DocumentBuilder()
@@ -28,13 +36,15 @@ async function bootstrap() {
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
   
-  // Get port from environment or use default
-  const port = process.env.PORT || 3000;
+  // Get port from environment
+  const port = configService.get('PORT');
+  const nodeEnv = configService.get('NODE_ENV');
   
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}/api`);
-  console.log(`Swagger documentation is available at: http://localhost:${port}/api/docs`);
+  console.log(`Application is running in ${nodeEnv} mode`);
+  console.log(`Server is running on: http://localhost:${port}/${apiPrefix}`);
+  console.log(`Swagger documentation is available at: http://localhost:${port}/${apiPrefix}/docs`);
 }
 bootstrap(); 

@@ -8,11 +8,15 @@ import { DevicesModule } from './devices/devices.module';
 import { EntitiesModule } from './entities/entities.module';
 import { SeedModule } from './seeds/seed.module';
 import { getDatabaseConfig } from './config/database.config';
+import { validateEnv } from './config/env.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: validateEnv,
+      cache: true,
+      expandVariables: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

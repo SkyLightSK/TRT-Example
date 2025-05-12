@@ -1,16 +1,20 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Client } from 'pg';
+import { Logger } from '@nestjs/common';
 
 export const getDatabaseConfig = async (
   configService: ConfigService
 ): Promise<TypeOrmModuleOptions> => {
+  const logger = new Logger('DatabaseConfig');
+  
   // Database connection details
   const host = configService.get('DB_HOST', 'localhost');
   const port = configService.get<number>('DB_PORT', 5432);
   const username = configService.get('DB_USERNAME', 'postgres');
   const password = configService.get('DB_PASSWORD', 'password');
   const database = configService.get('DB_DATABASE', 'trt_portal');
+  const nodeEnv = configService.get('NODE_ENV', 'development');
   
   // Try to create database if it doesn't exist
   const client = new Client({
@@ -23,7 +27,6 @@ export const getDatabaseConfig = async (
   
   try {
     await client.connect();
-    console.log('Connected to PostgreSQL server to check for database existence');
     
     // Check if database exists
     const res = await client.query(
@@ -32,27 +35,22 @@ export const getDatabaseConfig = async (
     );
     
     if (res.rowCount === 0) {
-      console.log(`Database "${database}" not found, creating it...`);
       await client.query(`CREATE DATABASE "${database}"`);
-      console.log(`Database "${database}" created successfully`);
-    } else {
-      console.log(`Database "${database}" already exists`);
+      logger.log(`Database "${database}" created`);
     }
   } catch (error) {
-    console.error('Error checking/creating database:', error.message);
     if (error.code === '28P01') {
-      console.error('Authentication failed. Please check your username and password.');
+      logger.error('Authentication failed. Please check your username and password.');
     } else if (error.code === 'ECONNREFUSED') {
-      console.error('Connection refused. Please check if PostgreSQL server is running.');
+      logger.error('Connection refused. Please check if PostgreSQL server is running.');
+    } else {
+      logger.error(`Database connection error: ${error.message}`);
     }
-    // Continue with application startup even if database creation fails
-    // The TypeORM connection attempt will show more specific errors
   } finally {
     try {
       await client.end();
-      console.log('Closed initial PostgreSQL connection');
     } catch (err) {
-      console.error('Error closing PostgreSQL client:', err.message);
+      logger.error(`Error closing PostgreSQL client: ${err.message}`);
     }
   }
   
@@ -65,7 +63,8 @@ export const getDatabaseConfig = async (
     password,
     database,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    synchronize: configService.get('NODE_ENV') !== 'production',
-    logging: configService.get('NODE_ENV') !== 'production',
+    synchronize: nodeEnv !== 'production',
+    logging: false, // Disable SQL query logging completely
+    maxQueryExecutionTime: 1000, // Log only slow queries (>1000ms)
   };
 }; 

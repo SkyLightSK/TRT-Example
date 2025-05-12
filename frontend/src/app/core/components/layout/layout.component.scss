@@ -286,6 +286,24 @@ $breakpoint-lg: 992px;
   position: relative;
 }
 
+// Sidebar backdrop
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1999;
+  
+  @media (max-width: $breakpoint-md) {
+    &.show {
+      display: block;
+    }
+  }
+}
+
 // Sidebar
 .sidebar {
   width: $sidebar-width;
@@ -299,9 +317,10 @@ $breakpoint-lg: 992px;
     top: 0;
     right: -$sidebar-width;
     height: 100vh;
-    z-index: 1000;
+    z-index: 2000;
     box-shadow: -2px 0 5px rgba(0,0,0,0.2);
     background-color: white;
+    transform: translateZ(0);
     
     &.mobile-open {
       right: 0;

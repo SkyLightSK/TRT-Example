@@ -49,6 +49,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow: hidden;
+    z-index: 1;
 
     table {
       width: 100%;
@@ -128,6 +129,8 @@
   background-color: #f9f9f9;
   min-height: calc(100vh - 120px);
   box-sizing: border-box;
+  position: relative;
+  z-index: auto;
   
   .devices-header {
     display: flex;
@@ -176,12 +179,15 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    z-index: 1;
     
     table {
       width: 100%;
       
       ::ng-deep .mat-header-row {
         background-color: #fafafa;
+        position: relative;
+        z-index: 1;
         
         .mat-header-cell {
           font-weight: 600;
@@ -269,7 +275,7 @@
       right: 0;
       bottom: 0;
       background: rgba(255, 255, 255, 0.8);
-      z-index: 10;
+      z-index: 5;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -307,6 +313,17 @@
 // Remove conflicting global form field overrides
 // Only keep styles for status indicators and common components
 ::ng-deep {
+  // Fix for Angular Material sticky headers
+  .mat-table {
+    position: relative;
+    z-index: auto !important;
+  }
+
+  .mat-table-sticky {
+    position: sticky !important;
+    z-index: 1 !important;
+  }
+  
   // Status style in selects and forms
   .active {
     color: #4CAF50;
@@ -339,6 +356,8 @@
     
     .table-container {
       overflow-x: auto;
+      position: relative;
+      z-index: 1;
       
       .mat-column-manufacturer,
       .mat-column-location {

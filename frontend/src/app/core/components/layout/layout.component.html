@@ -16,10 +16,10 @@
             <span class="user-role">{{ (currentUser$ | async)?.role || 'Not logged in' }}</span>
           </div>
           <div class="user-menu-items">
-            <a routerLink="/profile">
+            <a class="disabled" title="Profile settings not available">
               <span class="menu-icon">👤</span> Profile
             </a>
-            <a routerLink="/settings">
+            <a class="disabled" title="Settings not available">
               <span class="menu-icon">⚙️</span> Settings
             </a>
             <button (click)="logout()">

@@ -148,6 +148,20 @@
           background-color: #f8f9fa;
         }
 
+        &.disabled {
+          color: #aaa;
+          cursor: not-allowed;
+          pointer-events: none;
+          
+          &:hover {
+            background-color: transparent;
+          }
+          
+          .menu-icon {
+            opacity: 0.5;
+          }
+        }
+
         .menu-icon {
           margin-right: 0.5rem;
           font-size: 1.25rem;

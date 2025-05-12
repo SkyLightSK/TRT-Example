@@ -1,26 +1,30 @@
-<div class="devices-container">
-  <div class="devices-header">
+<div class="page-container">
+  <div class="dashboard-header">
     <h1>Terminals Inventory</h1>
-    <div class="action-buttons">
-      <button mat-raised-button color="accent" (click)="loadDevices()">
-        <mat-icon>refresh</mat-icon>
-        Refresh Data
-      </button>
-      <button mat-raised-button color="primary" (click)="openDeviceForm()">
-        <mat-icon>add</mat-icon>
-        Add Terminal
+    <div class="actions">
+      <button class="btn btn-add" (click)="openDeviceForm()">
+        <i class="fas fa-plus"></i> Add Terminal
       </button>
     </div>
   </div>
 
-  <mat-form-field class="filter-field" appearance="outline">
-    <mat-label>Filter</mat-label>
-    <input matInput (keyup)="applyFilter($event)" #input>
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
+  <div class="toolbar-container">
+    <div class="search-section">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter Devices</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Filter by any field" #input>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+    <div class="action-buttons">
+      <button class="btn btn-refresh" (click)="loadDevices()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+  </div>
 
-  <div class="table-container mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort>
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort class="data-table">
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
@@ -48,7 +52,9 @@
       <!-- Warranty Expiration Column -->
       <ng-container matColumnDef="warrantyExpiration">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Warranty Expiration</th>
-        <td mat-cell *matCellDef="let device">{{device.warrantyExpiration ? (device.warrantyExpiration | date) : 'N/A'}}</td>
+        <td mat-cell *matCellDef="let device">
+          {{device.warrantyExpiration ? (device.warrantyExpiration | date) : 'N/A'}}
+        </td>
       </ng-container>
 
       <!-- Status Column -->
@@ -63,8 +69,8 @@
 
       <!-- Actions Column -->
       <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let device">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let device" class="actions-cell">
           <button mat-icon-button color="primary" (click)="openDeviceForm(device)" matTooltip="Edit">
             <mat-icon>edit</mat-icon>
           </button>
@@ -78,15 +84,22 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
       <!-- Row shown when there is no matching data. -->
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="7">No data matching the filter "{{filterValue}}"</td>
+      <tr class="mat-row no-data-row" *matNoDataRow>
+        <td class="mat-cell" colspan="7">
+          <ng-container *ngIf="dataSource.data.length === 0; else noMatchingData">
+            No terminals found. Click "Add Terminal" to create one.
+          </ng-container>
+          <ng-template #noMatchingData>
+            No data matching the filter "{{filterValue}}"
+          </ng-template>
+        </td>
       </tr>
     </table>
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of terminals"></mat-paginator>
 
     <div class="loading-shade" *ngIf="isLoading">
-      <mat-spinner diameter="50"></mat-spinner>
+      <mat-spinner diameter="40"></mat-spinner>
     </div>
   </div>
 </div> 

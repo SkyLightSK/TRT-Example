@@ -1,27 +1,30 @@
-<div class="devices-container">
-  <div class="devices-header">
+<div class="page-container">
+  <div class="dashboard-header">
     <h1>Hardware Inventory</h1>
-    <div class="action-buttons">
-      <button mat-raised-button color="accent" (click)="loadDevices()">
+    <div class="actions">
+      <button class="btn btn-refresh" (click)="loadDevices()">
         <mat-icon>refresh</mat-icon>
-        Refresh Data
+        Refresh
       </button>
-      <button mat-raised-button color="primary" (click)="openDeviceForm()">
+      <button class="btn btn-add" (click)="openDeviceForm()">
         <mat-icon>add</mat-icon>
         Add Device
       </button>
     </div>
   </div>
 
-  <mat-form-field class="filter-field" appearance="outline">
-    <mat-label>Filter Devices</mat-label>
-    <input matInput (keyup)="applyFilter($event)" #input>
-    <mat-icon matSuffix>search</mat-icon>
-    <mat-hint>Filter by any device property</mat-hint>
-  </mat-form-field>
+  <div class="toolbar-container">
+    <div class="search-section">
+      <mat-form-field class="filter-field" appearance="outline">
+        <mat-label>Filter Devices</mat-label>
+        <input matInput (keyup)="applyFilter($event)" #input>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
 
-  <div class="table-container mat-elevation-z2">
-    <table mat-table [dataSource]="dataSource" matSort aria-label="Device inventory">
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort aria-label="Device inventory" class="data-table">
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
@@ -68,8 +71,8 @@
 
       <!-- Actions Column -->
       <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let device">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let device" class="actions-cell">
           <button mat-icon-button color="primary" (click)="openDeviceForm(device)" matTooltip="Edit Device">
             <mat-icon>edit</mat-icon>
           </button>

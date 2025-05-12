@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService, User } from '../../services/auth.service';
@@ -13,10 +13,14 @@ import { Observable } from 'rxjs';
 })
 export class LayoutComponent implements OnInit {
   userMenuOpen = false;
+  mobileMenuOpen = false;
+  mobileSidebarOpen = false;
+  isMobileView = false;
   currentUser$: Observable<User | null>;
 
   constructor(public authService: AuthService) {
     this.currentUser$ = this.authService.currentUser$;
+    this.checkScreenSize();
   }
 
   ngOnInit(): void {
@@ -29,6 +33,43 @@ export class LayoutComponent implements OnInit {
     document.removeEventListener('click', this.closeMenuOnClickOutside.bind(this));
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    this.isMobileView = window.innerWidth < 768;
+    if (!this.isMobileView) {
+      this.mobileMenuOpen = false;
+      this.mobileSidebarOpen = false;
+    }
+  }
+
+  toggleMobileMenu(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+    
+    // Close sidebar if menu is toggled
+    if (this.mobileMenuOpen) {
+      this.mobileSidebarOpen = false;
+    }
+  }
+
+  toggleMobileSidebar(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+    
+    // Close menu if sidebar is toggled
+    if (this.mobileSidebarOpen) {
+      this.mobileMenuOpen = false;
+    }
+  }
+
   toggleUserMenu(event?: Event): void {
     if (event) {
       event.stopPropagation();
@@ -38,8 +79,21 @@ export class LayoutComponent implements OnInit {
 
   closeMenuOnClickOutside(event: Event): void {
     const userProfileElement = document.querySelector('.user-profile');
+    const mobileMenuButtonElement = document.querySelector('.mobile-menu-button');
+    const mobileSidebarButtonElement = document.querySelector('.mobile-sidebar-button');
+    
     if (this.userMenuOpen && userProfileElement && !userProfileElement.contains(event.target as Node)) {
       this.userMenuOpen = false;
+    }
+    
+    if (this.mobileMenuOpen && mobileMenuButtonElement && !mobileMenuButtonElement.contains(event.target as Node) && 
+        !(event.target as HTMLElement).closest('.navbar-menu')) {
+      this.mobileMenuOpen = false;
+    }
+    
+    if (this.mobileSidebarOpen && mobileSidebarButtonElement && !mobileSidebarButtonElement.contains(event.target as Node) && 
+        !(event.target as HTMLElement).closest('.sidebar')) {
+      this.mobileSidebarOpen = false;
     }
   }
 

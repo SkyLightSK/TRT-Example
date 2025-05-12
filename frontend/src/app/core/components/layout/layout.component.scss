@@ -1,3 +1,33 @@
+// Variables
+$primary-color: #2c3e50;
+$secondary-color: #3498db;
+$light-color: #f8f9fa;
+$border-color: #eee;
+$text-light: rgba(255,255,255,0.8);
+$text-dark: #343a40;
+$nav-height: 60px;
+$sidebar-width: 250px;
+$box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+$transition: all 0.3s ease;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin button-reset {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+}
+
+// Layout structure
 .layout {
   display: flex;
   flex-direction: column;
@@ -6,76 +36,144 @@
   overflow: hidden;
 }
 
+// Navbar
 .navbar {
-  display: flex;
-  align-items: center;
+  @include flex-center;
+  justify-content: space-between;
   padding: 0 1rem;
-  height: 60px;
-  background-color: #2c3e50;
+  height: $nav-height;
+  background-color: $primary-color;
   color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: $box-shadow;
   z-index: 10;
+  position: relative;
+}
+
+.navbar-left, 
+.navbar-right {
+  @include flex-center;
+  gap: 1rem;
 }
 
 .navbar-brand {
   font-size: 1.5rem;
   font-weight: bold;
-  margin-right: 2rem;
+  white-space: nowrap;
 }
 
+// Mobile menu & sidebar toggle buttons
+.mobile-menu-button,
+.mobile-sidebar-button {
+  @include button-reset;
+  @include flex-center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  color: white;
+  
+  &:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 4px;
+  }
+}
+
+// Navbar menu
 .navbar-menu {
-  display: flex;
+  @include flex-center;
   gap: 1.5rem;
   
-  a {
-    color: rgba(255,255,255,0.8);
-    text-decoration: none;
-    padding: 0.5rem 0;
-    position: relative;
+  // Mobile menu styling
+  @media (max-width: $breakpoint-md) {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    transition: $transition;
+    padding: 1rem 0;
+    overflow-y: auto;
     
-    &:after {
-      content: '';
-      position: absolute;
-      bottom: 0;
+    &.mobile-open {
       left: 0;
-      width: 0;
-      height: 2px;
-      background-color: #3498db;
-      transition: width 0.3s;
     }
     
-    &:hover, &.active {
-      color: white;
+    a {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      color: $text-dark;
+      border-bottom: 1px solid $border-color;
       
       &:after {
-        width: 100%;
+        display: none;
+      }
+      
+      &:hover, &.active {
+        background-color: $light-color;
+        color: $secondary-color;
+      }
+    }
+  }
+  
+  // Desktop menu styling
+  @media (min-width: $breakpoint-md) {
+    a {
+      color: $text-light;
+      text-decoration: none;
+      padding: 0.5rem 0;
+      position: relative;
+      
+      &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: $secondary-color;
+        transition: width 0.3s;
+      }
+      
+      &:hover, &.active {
+        color: white;
+        
+        &:after {
+          width: 100%;
+        }
       }
     }
   }
 }
 
-.navbar-right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.mobile-menu-header {
+  @include flex-center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid $border-color;
+  margin-bottom: 0.5rem;
 }
 
-.entity-badge {
-  display: flex;
-  align-items: center;
-  background-color: rgba(255,255,255,0.1);
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
+.close-button {
+  @include button-reset;
+  font-size: 1.25rem;
+  color: #666;
   
-  .icon {
-    margin-right: 0.5rem;
+  &:hover {
+    color: #333;
   }
 }
 
+// User profile and menu
 .user-profile {
-  display: flex;
-  align-items: center;
+  @include flex-center;
   cursor: pointer;
   position: relative;
   padding: 0.5rem;
@@ -88,15 +186,20 @@
   
   .user-name {
     margin-right: 0.75rem;
+    
+    &.hidden-mobile {
+      @media (max-width: $breakpoint-md) {
+        display: none;
+      }
+    }
   }
   
   .avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: #3498db;
-    display: flex;
-    align-items: center;
+    background-color: $secondary-color;
+    @include flex-center;
     justify-content: center;
     font-weight: bold;
   }
@@ -115,9 +218,9 @@
     color: #333;
 
     .user-menu-header {
-      background-color: #f8f9fa;
+      background-color: $light-color;
       padding: 0.75rem 1rem;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid $border-color;
 
       .user-role {
         font-size: 0.875rem;
@@ -132,8 +235,7 @@
 
       a, button {
         padding: 0.75rem 1rem;
-        display: flex;
-        align-items: center;
+        @include flex-center;
         text-decoration: none;
         color: #333;
         transition: background-color 0.2s;
@@ -145,7 +247,7 @@
         cursor: pointer;
 
         &:hover {
-          background-color: #f8f9fa;
+          background-color: $light-color;
         }
 
         &.disabled {
@@ -169,40 +271,59 @@
       }
 
       button {
-        border-top: 1px solid #eee;
+        border-top: 1px solid $border-color;
         color: #e74c3c;
       }
     }
   }
 }
 
+// Main content area
 .main-content {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
+// Sidebar
 .sidebar {
-  width: 250px;
-  background-color: #f8f9fa;
-  padding: 1.5rem 1rem;
-  border-right: 1px solid #eee;
+  width: $sidebar-width;
+  background-color: $light-color;
+  border-right: 1px solid $border-color;
   overflow-y: auto;
+  transition: $transition;
   
-  .entity-selector {
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
+  @media (max-width: $breakpoint-md) {
+    position: fixed;
+    top: 0;
+    right: -$sidebar-width;
+    height: 100vh;
+    z-index: 1000;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    background-color: white;
     
-    select {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    &.mobile-open {
+      right: 0;
+    }
+  }
+  
+  .sidebar-header {
+    @include flex-center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid $border-color;
+    background-color: white;
+    
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
     }
   }
   
   .sidebar-nav {
     padding: 1rem 0;
+    background-color: white;
     
     .nav-section {
       margin-bottom: 1.5rem;
@@ -218,21 +339,26 @@
       a {
         display: block;
         padding: 0.5rem 1rem;
-        color: #343a40;
+        color: $text-dark;
         text-decoration: none;
         
         &:hover, &.active {
           background-color: rgba(52, 152, 219, 0.1);
-          color: #3498db;
+          color: $secondary-color;
         }
       }
     }
   }
 }
 
+// Content area
 .content {
   flex: 1;
   padding: 1.5rem;
   overflow-y: auto;
   background-color: #f9fafb;
+  
+  @media (max-width: $breakpoint-md) {
+    padding: 1rem;
+  }
 } 

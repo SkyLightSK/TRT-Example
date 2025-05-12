@@ -1,15 +1,29 @@
 <div class="layout">
   <nav class="navbar">
-    <div class="navbar-brand">TRT Portal</div>
-    <div class="navbar-menu">
+    <div class="navbar-left">
+      <button class="mobile-menu-button" (click)="toggleMobileMenu($event)" *ngIf="isMobileView">
+        <span class="menu-icon">☰</span>
+      </button>
+      <div class="navbar-brand">TRT Portal</div>
+    </div>
+    
+    <div class="navbar-menu" [class.mobile-open]="mobileMenuOpen">
+      <div class="mobile-menu-header" *ngIf="isMobileView">
+        <div class="navbar-brand">TRT Portal</div>
+        <button class="close-button" (click)="toggleMobileMenu($event)">✕</button>
+      </div>
       <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
       <a routerLink="/hardware" routerLinkActive="active">Hardware</a>
       <a routerLink="/budget" routerLinkActive="active">Budget</a>
       <a routerLink="/admin" routerLinkActive="active" *ngIf="authService.hasRole('ADMIN')">Admin</a>
     </div>
+    
     <div class="navbar-right">
-      <div class="user-profile" (click)="toggleUserMenu()" [class.active]="userMenuOpen">
-        <span class="user-name">{{ (currentUser$ | async)?.username || 'Guest' }}</span>
+      <button class="mobile-sidebar-button" (click)="toggleMobileSidebar($event)" *ngIf="isMobileView">
+        <span class="sidebar-icon">≡</span>
+      </button>
+      <div class="user-profile" (click)="toggleUserMenu($event)" [class.active]="userMenuOpen">
+        <span class="user-name" [class.hidden-mobile]="isMobileView">{{ (currentUser$ | async)?.username || 'Guest' }}</span>
         <div class="avatar">{{ getFirstInitial((currentUser$ | async)?.username) }}</div>
         <div class="user-menu" *ngIf="userMenuOpen">
           <div class="user-menu-header">
@@ -32,7 +46,11 @@
   </nav>
   
   <div class="main-content">
-    <aside class="sidebar">
+    <aside class="sidebar" [class.mobile-open]="mobileSidebarOpen">
+      <div class="sidebar-header" *ngIf="isMobileView">
+        <h2>Menu</h2>
+        <button class="close-button" (click)="toggleMobileSidebar($event)">✕</button>
+      </div>
       <nav class="sidebar-nav">
         <div class="nav-section">
           <h3>Hardware</h3>

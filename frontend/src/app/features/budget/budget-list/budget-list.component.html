@@ -1,29 +1,36 @@
-<div class="budget-container">
-  <div class="header">
+<div class="page-container">
+  <div class="dashboard-header">
     <h1>Budget Management</h1>
-    <div class="controls">
+    <div class="actions">
+      <button class="btn btn-refresh" (click)="refreshData()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <button class="btn btn-add" (click)="onAdd()">
+        <mat-icon>add</mat-icon>
+        Add Budget
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar-container">
+    <div class="search-section">
       <div class="year-selector">
         <label for="year">Fiscal Year:</label>
         <select id="year" [ngModel]="selectedYear" (ngModelChange)="onYearChange($event)">
           <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
         </select>
       </div>
-      <button mat-raised-button color="accent" (click)="refreshData()">
-        <mat-icon>refresh</mat-icon> Refresh Data
-      </button>
-      <button mat-raised-button color="primary" (click)="onAdd()">
-        <mat-icon>add</mat-icon> Add Budget
-      </button>
     </div>
   </div>
 
   <!-- Budget Overview Card -->
-  <mat-card *ngIf="filteredBudgets.length && !selectedBudget" class="budget-summary">
-    <mat-card-header>
-      <mat-card-title>Budget Overview</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="summary-grid">
+  <div class="card" *ngIf="filteredBudgets.length && !selectedBudget">
+    <div class="card-header">
+      <h2>Budget Overview</h2>
+    </div>
+    <div class="card-content">
+      <div class="grid grid-2">
         <div class="summary-item">
           <span class="label">Total Budget</span>
           <span class="value">{{ getTotalAmount() | currency }}</span>
@@ -33,24 +40,24 @@
           <span class="value">{{ filteredBudgets.length }}</span>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 
   <!-- Selected Budget View -->
   <div *ngIf="selectedBudget" class="selected-budget-view">
     <div class="heading-with-actions">
-      <button mat-button color="primary" (click)="backToBudgetList()">
+      <button class="btn btn-secondary" (click)="backToBudgetList()">
         <mat-icon>arrow_back</mat-icon> Back to Budgets
       </button>
       <h2>{{ selectedBudget.name }}</h2>
     </div>
 
-    <mat-card class="budget-card">
-      <mat-card-header>
-        <mat-card-title>Budget Details</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="budget-details">
+    <div class="card">
+      <div class="card-header">
+        <h2>Budget Details</h2>
+      </div>
+      <div class="card-content">
+        <div class="grid grid-2">
           <div class="detail-item">
             <span class="label">Fiscal Year:</span>
             <span class="value">{{ selectedBudget.fiscalYear }}</span>
@@ -72,14 +79,14 @@
             <span class="value">{{ selectedBudget.notes }}</span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <h3>Budget Items</h3>
     
     <div class="loading-container" *ngIf="loadingItems">
-      <mat-spinner diameter="40"></mat-spinner>
-      <span>Loading budget items...</span>
+      <div class="loading-spinner"></div>
+      <p>Loading budget items...</p>
     </div>
     
     <div class="empty-state" *ngIf="!loadingItems && filteredBudgetItems.length === 0">
@@ -89,72 +96,82 @@
       <!-- TODO: Add budget item creation button when implemented -->
     </div>
     
-    <div class="budget-items-grid" *ngIf="!loadingItems && filteredBudgetItems.length > 0">
-      <div class="grid-header">
-        <div class="col">Description</div>
-        <div class="col">Amount</div>
-        <div class="col">Entity</div>
-        <div class="col">Notes</div>
-        <div class="col actions">Actions</div>
-      </div>
-      
-      <div class="grid-row" *ngFor="let item of filteredBudgetItems">
-        <div class="col">{{ item.description }}</div>
-        <div class="col">{{ item.amount | currency }}</div>
-        <div class="col">{{ item.entity?.name || 'N/A' }}</div>
-        <div class="col">{{ item.notes || '' }}</div>
-        <div class="col actions">
-          <button mat-icon-button color="primary" (click)="onEditBudgetItem(item)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="onDeleteBudgetItem(item)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
+    <div class="table-container" *ngIf="!loadingItems && filteredBudgetItems.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Entity</th>
+            <th>Notes</th>
+            <th class="actions-header">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredBudgetItems">
+            <td>{{ item.description }}</td>
+            <td>{{ item.amount | currency }}</td>
+            <td>{{ item.entity?.name || 'N/A' }}</td>
+            <td>{{ item.notes || '' }}</td>
+            <td class="actions-cell">
+              <button mat-icon-button color="primary" (click)="onEditBudgetItem(item)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="onDeleteBudgetItem(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <!-- Budgets List View -->
   <div *ngIf="!selectedBudget">
     <div class="loading-container" *ngIf="loading">
-      <mat-spinner diameter="40"></mat-spinner>
-      <span>Loading budgets...</span>
+      <div class="loading-spinner"></div>
+      <p>Loading budgets...</p>
     </div>
     
     <div class="empty-state" *ngIf="!loading && filteredBudgets.length === 0">
       <p>No budgets found for the selected year.</p>
-      <button mat-raised-button color="primary" (click)="onAdd()">Create New Budget</button>
+      <button class="btn btn-add" (click)="onAdd()">Create New Budget</button>
     </div>
     
-    <div class="budget-grid" *ngIf="!loading && filteredBudgets.length > 0">
-      <div class="grid-header">
-        <div class="col">Name</div>
-        <div class="col">Fiscal Year</div>
-        <div class="col">Total Amount</div>
-        <div class="col">Start Date</div>
-        <div class="col">End Date</div>
-        <div class="col actions">Actions</div>
-      </div>
-      
-      <div class="grid-row" *ngFor="let budget of filteredBudgets">
-        <div class="col">{{ budget.name }}</div>
-        <div class="col">{{ budget.fiscalYear }}</div>
-        <div class="col">{{ budget.totalAmount | currency }}</div>
-        <div class="col">{{ budget.startDate | date }}</div>
-        <div class="col">{{ budget.endDate | date }}</div>
-        <div class="col actions">
-          <button mat-icon-button color="primary" (click)="onEditBudget(budget)" matTooltip="Edit Budget">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="onDeleteBudget(budget)" matTooltip="Delete Budget">
-            <mat-icon>delete</mat-icon>
-          </button>
-          <button mat-raised-button color="accent" (click)="viewBudgetItems(budget)">
-            <mat-icon>list</mat-icon> Items
-          </button>
-        </div>
-      </div>
+    <div class="table-container" *ngIf="!loading && filteredBudgets.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Fiscal Year</th>
+            <th>Total Amount</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th class="actions-header">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let budget of filteredBudgets">
+            <td>{{ budget.name }}</td>
+            <td>{{ budget.fiscalYear }}</td>
+            <td>{{ budget.totalAmount | currency }}</td>
+            <td>{{ budget.startDate | date }}</td>
+            <td>{{ budget.endDate | date }}</td>
+            <td class="actions-cell">
+              <button mat-icon-button color="primary" (click)="onEditBudget(budget)" matTooltip="Edit Budget">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="onDeleteBudget(budget)" matTooltip="Delete Budget">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="btn btn-secondary btn-sm" (click)="viewBudgetItems(budget)">
+                <mat-icon>list</mat-icon> Items
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -208,8 +225,8 @@
         </div>
         
         <div class="form-actions">
-          <button type="button" mat-button (click)="closeModal()">Cancel</button>
-          <button type="submit" mat-raised-button color="primary" [disabled]="budgetForm.invalid">Save</button>
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="budgetForm.invalid">Save</button>
         </div>
       </form>
     </div>

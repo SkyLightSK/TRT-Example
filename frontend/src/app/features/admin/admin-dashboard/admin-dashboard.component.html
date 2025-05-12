@@ -5,17 +5,24 @@
   </div>
 
   <div class="admin-modules-grid">
-    <mat-card class="admin-module-card" *ngFor="let feature of features" [style.border-top]="'4px solid ' + feature.color" (click)="navigateTo(feature.route)">
+    <mat-card class="admin-module-card" *ngFor="let feature of features" 
+      [style.border-top]="'4px solid ' + feature.color" 
+      [class.disabled]="feature.disabled"
+      (click)="!feature.disabled && navigateTo(feature.route)">
       <mat-card-header>
         <div mat-card-avatar class="module-icon" [style.background-color]="feature.color">
           <mat-icon>{{feature.icon}}</mat-icon>
         </div>
         <mat-card-title>{{feature.title}}</mat-card-title>
-        <mat-card-subtitle>{{feature.description}}</mat-card-subtitle>
+        <mat-card-subtitle>
+          <span *ngIf="feature.disabled" class="disabled-badge">Coming Soon</span>
+          {{feature.description}}
+        </mat-card-subtitle>
       </mat-card-header>
       <mat-card-actions align="end">
-        <button mat-button [routerLink]="feature.route">
-          OPEN <mat-icon>arrow_forward</mat-icon>
+        <button mat-button [disabled]="feature.disabled" [routerLink]="!feature.disabled ? feature.route : null">
+          <span *ngIf="!feature.disabled">OPEN <mat-icon>arrow_forward</mat-icon></span>
+          <span *ngIf="feature.disabled">DISABLED</span>
         </button>
       </mat-card-actions>
     </mat-card>

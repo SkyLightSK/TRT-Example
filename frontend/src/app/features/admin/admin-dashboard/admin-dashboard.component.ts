@@ -12,6 +12,7 @@ interface AdminFeature {
   icon: string;
   route: string;
   color: string;
+  disabled?: boolean;
 }
 
 @Component({
@@ -42,14 +43,16 @@ export class AdminDashboardComponent {
       description: 'Configure system-wide settings and preferences',
       icon: 'settings',
       route: '/admin/settings',
-      color: '#ec407a'
+      color: '#ec407a',
+      disabled: true
     },
     {
       title: 'Audit Logs',
       description: 'View system activity and user actions',
       icon: 'history',
       route: '/admin/audit-logs',
-      color: '#8d6e63'
+      color: '#8d6e63',
+      disabled: true
     }
   ];
 

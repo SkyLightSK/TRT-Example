@@ -54,16 +54,6 @@
         </td>
       </ng-container>
 
-      <!-- Status Column -->
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-        <td mat-cell *matCellDef="let user">
-          <span class="status-badge" [ngClass]="user.status?.toLowerCase()">
-            {{user.status}}
-          </span>
-        </td>
-      </ng-container>
-
       <!-- Actions Column -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
@@ -79,10 +69,6 @@
             <button mat-menu-item (click)="openRolesDialog(user)">
               <mat-icon>supervisor_account</mat-icon>
               <span>Change Role</span>
-            </button>
-            <button mat-menu-item (click)="toggleStatus(user)">
-              <mat-icon>power_settings_new</mat-icon>
-              <span>{{user.status === 'Active' ? 'Deactivate' : 'Activate'}}</span>
             </button>
             <button mat-menu-item (click)="confirmDelete(user)">
               <mat-icon>delete</mat-icon>

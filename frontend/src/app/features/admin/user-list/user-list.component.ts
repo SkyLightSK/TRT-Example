@@ -16,6 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../../core/services/api.service';
 import { catchError, finalize, of } from 'rxjs';
+import { UserFormDialogComponent } from './user-form-dialog.component';
 
 // Match the backend entity structure
 interface Entity {
@@ -29,7 +30,6 @@ interface User {
   email: string;
   role: string;
   entities?: Entity[];
-  status?: 'Active' | 'Inactive' | 'Pending';
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -49,7 +49,6 @@ interface UpdateUserDto {
   password?: string;
   role?: string;
   entities?: number[];
-  status?: string;
 }
 
 @Component({
@@ -71,13 +70,14 @@ interface UpdateUserDto {
     MatTooltipModule,
     MatChipsModule,
     MatMenuModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    UserFormDialogComponent
   ],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit {
-  displayedColumns: string[] = ['username', 'email', 'role', 'entities', 'status', 'actions'];
+  displayedColumns: string[] = ['username', 'email', 'role', 'entities', 'actions'];
   dataSource = new MatTableDataSource<User>([]);
   isLoading = false;
   filterValue = '';
@@ -108,13 +108,11 @@ export class UserListComponent implements OnInit {
 
   createUserForm(): FormGroup {
     return this.fb.group({
-      id: [null],
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['user', Validators.required],
-      entities: [[]],
-      status: ['Active']
+      entities: [[]]
     });
   }
 
@@ -135,7 +133,6 @@ export class UserListComponent implements OnInit {
         // Map backend data to the format needed by the frontend
         const mappedUsers = users.map((user: User) => ({
           ...user,
-          status: this.getUserStatus(user),
           entities: user.entities || []
         }));
         this.dataSource.data = mappedUsers;
@@ -155,16 +152,6 @@ export class UserListComponent implements OnInit {
       });
   }
 
-  getUserStatus(user: User): 'Active' | 'Inactive' | 'Pending' {
-    // Determine user status logic - this is an example and can be adjusted based on your backend
-    // In a real app, the status would likely come from the backend directly
-    if (user.createdAt && !user.updatedAt) {
-      return 'Pending';
-    }
-    // You might have a specific field for this in your backend
-    return 'Active';
-  }
-
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filterValue = filterValue.trim().toLowerCase();
@@ -182,6 +169,13 @@ export class UserListComponent implements OnInit {
   }
 
   openUserDialog(user?: User): void {
+    // Prepare the form based on whether we're editing or creating
+    if (user) {
+      this.prepareFormForEdit(user);
+    } else {
+      this.prepareFormForCreate();
+    }
+
     // Create a dialog configuration
     const dialogConfig = {
       width: '500px',
@@ -192,43 +186,33 @@ export class UserListComponent implements OnInit {
       }
     };
 
-    // Here in a real implementation, we would open the dialog
-    // For example:
-    // const dialogRef = this.dialog.open(UserFormDialogComponent, dialogConfig);
-    // dialogRef.afterClosed().subscribe(result => {
-    //   if (result) {
-    //     if (user) {
-    //       this.updateUser(user.id, result);
-    //     } else {
-    //       this.createUser(result);
-    //     }
-    //   }
-    // });
-
-    // For simplicity in this implementation, we'll just directly call the methods
-    if (user) {
-      this.prepareFormForEdit(user);
-      this.updateUser(user.id, this.userForm.value);
-    } else {
-      this.prepareFormForCreate();
-      this.createUser(this.userForm.value);
-    }
+    // Open the dialog
+    const dialogRef = this.dialog.open(UserFormDialogComponent, dialogConfig);
+    
+    // Handle the dialog result
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (user) {
+          this.updateUser(user.id, result);
+        } else {
+          this.createUser(result);
+        }
+      }
+    });
   }
 
   prepareFormForEdit(user: User): void {
     // Fill form with user data
     this.userForm.patchValue({
-      id: user.id,
       username: user.username,
       email: user.email,
       role: user.role,
       entities: user.entities?.map(e => e.id) || [],
-      status: user.status || 'Active',
       // Don't set password as we don't want to update it automatically
       password: ''
     });
     // Password is optional when editing
-    this.userForm.get('password')?.setValidators(null);
+    this.userForm.get('password')?.setValidators(Validators.minLength(6));
     this.userForm.get('password')?.updateValueAndValidity();
   }
 
@@ -236,17 +220,25 @@ export class UserListComponent implements OnInit {
     // Reset form for new user
     this.userForm.reset({
       role: 'user',
-      status: 'Active',
       entities: []
     });
-    // Password is required when creating
-    this.userForm.get('password')?.setValidators(Validators.required);
+    // Password is required when creating and must be at least 6 characters
+    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
     this.userForm.get('password')?.updateValueAndValidity();
   }
 
   createUser(userData: CreateUserDto): void {
     this.isLoading = true;
-    this.apiService.post<User>('/users', userData)
+    
+    // Remove properties that shouldn't be sent to the backend
+    const userDataToSend = {
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      role: userData.role
+    };
+    
+    this.apiService.post<User>('/users', userDataToSend)
       .pipe(
         catchError(error => {
           console.error('Error creating user:', error);
@@ -268,12 +260,16 @@ export class UserListComponent implements OnInit {
   updateUser(id: number, userData: UpdateUserDto): void {
     this.isLoading = true;
     
-    // If password is empty, remove it from the update data
-    if (!userData.password) {
-      delete userData.password;
-    }
+    // Create a clean object with only valid properties for the backend
+    const userDataToSend: any = {};
     
-    this.apiService.patch<User>(`/users/${id}`, userData)
+    // Only include properties that are defined and should be sent to the backend
+    if (userData.username) userDataToSend.username = userData.username;
+    if (userData.email) userDataToSend.email = userData.email;
+    if (userData.password) userDataToSend.password = userData.password;
+    if (userData.role) userDataToSend.role = userData.role;
+    
+    this.apiService.patch<User>(`/users/${id}`, userDataToSend)
       .pipe(
         catchError(error => {
           console.error('Error updating user:', error);
@@ -324,14 +320,5 @@ export class UserListComponent implements OnInit {
         this.dataSource.data = this.dataSource.data.filter(u => u.id !== id);
         this.loadUsers();
       });
-  }
-
-  toggleStatus(user: User): void {
-    // Toggle between Active and Inactive
-    const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
-    
-    // In a real implementation, you'd have an endpoint to update status
-    // For now, let's assume we can do this with the regular update endpoint
-    this.updateUser(user.id, { status: newStatus });
   }
 } 

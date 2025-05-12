@@ -17,6 +17,7 @@ out/
 # IDE and editor files
 .idea/
 .vscode/
+.cursorrc
 *.sublime-project
 *.sublime-workspace
 .project

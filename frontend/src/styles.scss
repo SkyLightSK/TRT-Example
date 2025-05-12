@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 /* You can add global styles to this file, and also import other style files */
@@ -473,7 +474,7 @@ body {
     border: 1px solid #ddd;
     
     &:hover:not(:disabled) {
-      background-color: darken(#f8f9fa, 5%);
+      background-color: color.adjust(#f8f9fa, $lightness: -5%);
     }
     
     mat-icon, .btn-icon {
@@ -488,7 +489,7 @@ body {
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: darken(#3498db, 10%);
+      background-color: color.adjust(#3498db, $lightness: -10%);
     }
     
     mat-icon, .btn-icon {
@@ -504,7 +505,7 @@ body {
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: darken(#3498db, 10%);
+      background-color: color.adjust(#3498db, $lightness: -10%);
     }
   }
   
@@ -523,7 +524,7 @@ body {
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: darken(#e74c3c, 10%);
+      background-color: color.adjust(#e74c3c, $lightness: -10%);
     }
   }
   
